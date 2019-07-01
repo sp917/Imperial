@@ -1,0 +1,36 @@
+\documentclass[10pt]{article}
+\usepackage{fullpage}
+\usepackage{url}
+\usepackage{amsfonts}
+
+
+\input{../Preamble}
+\renewcommand\texteuro{FIXME} 
+\renewcommand\guillemotleft{FIXME} 
+
+\begin{document}
+\title{\vspace{-4.0em}Early Stage Assessment: Eddy Parameterizations in Oceanic Primitive Equation Models}
+\date{\vspace{-0.5em}}
+\author{Stuart Patching \\
+\small{Primary Supervisor: Professor Darryl Holm (Imperial College)}\\
+\small{Co-Supervisors: Dr. Pavel Berloff (Imperial College), Dr. Igor Shevchenko (Imperial College)} \vspace{-2em}}
+\maketitle
+
+\section{Introduction}
+	\input{Introduction}
+
+
+\section{Primitive Equations of Ocean Dynamics}	
+	\subsection{Derivation of equations}
+		\input{primeqs}
+
+\section{FESOM}
+	\input{fesom}
+
+\section{MITgcm}
+	\input{mitgcm}
+
+\newpage
+\bibliography{../refs}
+\bibliographystyle{alpha}
+\end{document}

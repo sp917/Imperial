@@ -1,0 +1,129 @@
+The primitive equations of ocean dynamics are commonly used in oceanic global circulation models as an approximation to the exact Navier-Stokes equations. They are obtained by two main assumptions: firstly, the Boussinesq approximation, which assumes that density variations are small compared to the background density; and secondly, the hydrostatic balance approximation, which assumes that the vertical velocities are so small that gravitational effects are approximately balanced by pressure. The result of the hydrostatic baance assumption is that we have no prognostic equation for vertical velocity, and we therefore use the divergence-free condition to calculate it diagnostically; this provides significant gains in numerical efficiency over the Boussinesq equations, for which vertical velocity is solved prognostically and the divergence-free condition must be used as an additional constraint \cite{adcroft_2004}. Moreover, although the Primitive Equations make this exta assumption, they are nonetheless significantly more realistic that the quasigeostrophic equations or rotating shallow water equations, which assume constant density within fluid layers and no vertical variation in velocity within layers. \\
+\indnt The primitive equations may be derived from the Navier-Stokes equations for hydrodynamics in a rotating frame under the influence of gravity with temperature as a tracer:
+\eqsyslab{
+	\pr_{t} \vec{u} + \vec{u}\cdot\nabla \vec{u} + \vec{f}\times \vec{u} & = -g\vec{e}_{3} -\frac{1}{\rho}\nabla p \\
+	\pr_{t}\rho + \nabla\cdot\lrb{\rho\vec{u}} & = 0 \\
+	\rho = \rho(p, T) \\
+	\rho\lrb{\pr_{t}T + \vec{u}\cdot\nabla T} & = 0
+}{NS}
+We use an arrow to denote a three-dimensional vector and boldface to denote a two-dimensional vector. To make approximations to \cref{eq:NS} we non-dimensionalise, splitting the three-dimensional velocity equation into its horizontal and vertical components as in \cite{holm_schmah_stoica_2011}:
+\algnn{
+	\vec{u} = (\B{u},w) \arr U(\B{u},\al w) \qquad \rho \arr \rho_{0}(1 + b)\qquad  \vec{f} \arr f_{0}\vec{f} \qquad p \arr f_{0}UL\rho_{0}p
+}
+and we define the following non-dimensional quantities:
+\algnn{
+	\al := H/L \qquad \eps := U/(f_{0}L) \qquad \Fc = gH/(f_{0}^{2}L^{2}) 	
+}
+From this we see:
+\algn{
+	\eps\lrb{\pr_{t}\B{u} + \B{u}\cdot\nabla_{2}\B{u} + w\PD{\B{u}}{z}} + \vec{f}\times\B{u} + \frac{1}{1+b}\nabla_{2} p & = 0 \label{eq:horvel}\\
+	\al^{2}\eps\lrb{\pr_{t}w + \B{u}\cdot\nabla_{2} w + w\PD{w}{z}} + \frac{1}{1+b}\PD{p}{z} + \frac{1}{\Fc\eps} &=0  \label{eq:vertvel}\\
+	\pr_{t}b + \B{u}\cdot\nabla_{2}b + w\PD{b}{z} + (1+b)\lrb{\nabla_{2}\cdot\B{u} + \PD{w}{z}} & = 0 \label{eq:cont}
+}
+We consider the case in which $\al^{2}\ll 1$, that is, the vertical heights considered are much smaller than horizontal distances. Then the $w$-equation, to first order in $\al$ gives hydrostatic balance:
+\eqlab{
+	\PD{p}{z} = -\frac{1}{\Fc \eps}(1 + b)
+}{HB}
+Moreover, we write $p = p_{0}(z) + p'(\B{x},z,t)$ such that $p_{0}$ satisfies $\PD{p_{0}}{z} = -\frac{1}{\Fc\eps}$ with $p_{0}(0) = 0$. Then we can solve \cref{eq:HB} with boundary condition $\left. p\right|_{z=\eta}= 0$ (where $\eta$ the height of the fluid surface) to get:
+\eqlab{
+	p'(\B{x},z,t) = \frac{1}{\Fc \eps}\lrb{ \eta(\B{x},t) + \int_{z}^{\eta(\B{x},t)} b(\B{x},z',t) dz' }
+}{hydrostaticpressure}
+We also use this to approximate the equation of state by $b=b(T,p(z))$. \\
+\linebreak
+Furthermore, let us assume that the variations away from the background density $\rho_{0}$ are small, and therefore that we may take $b\ll 1$. Thus \cref{eq:horvel} becomes:
+\eqnn{
+	\eps\lrb{\pr_{t}\B{u} + \B{u}\cdot\nabla_{2}\B{u} + w\PD{\B{u}}{z}} + \vec{f}\times\B{u} + \nabla_{2} p'  = 0
+}	 
+And we take the lowest order of \cref{eq:cont}, giving:
+\eqlab{
+	\nabla_{2}\cdot\B{u} + \PD{w}{z} = 0
+}{nodiv}
+Note that even though $b\ll 1$ we do not ignore it in the hydrostatic balance equation. This is because when we substitute $p$ into the horizontal velocity equation, the $b$ term contributes at a significant order. \\
+\linebreak
+If we integrate \cref{eq:nodiv} vertically between the bottom of the domain, $-H$ and the sea-surface height, $\eta$ and impose initial conditions $\left. w\right|_{z=\eta} = \PD{\eta}{t} + \left. \B{u}\right|_{z=\eta}\cdot\nabla\eta$ and $\left. w\right|_{z=-H} = -\left.\B{u}\right|_{z=-H}\cdot\nabla_{2}H$ we obtain the evolution equation for $\eta$:
+\eqnn{
+	\PD{\eta}{t} + \nabla_{2}\cdot\int_{-H}^{\eta} \B{u} dz = 0	
+}
+\iffalse
+Now, if we combine \cref{eq:cont} with the equation of state $b = b(T,p)$ we find:
+\eqnn{
+	\PD{b}{T}\DD{T}{t} + \PD{b}{p}\DD{p}{t} + (1+b)\lrb{\nabla_{2}\cdot\B{u} + \PD{w}{z}} = 0
+}
+where $\DD{}{t} := \B{u}\cdot\nabla_{2} + w\PD{}{z}$. To eliminate acoustic modes (see \cite{adcroft_2004}) we take the speed of sound $c_{s} = 1/\sqrt{\PD{b}{p}} \arr \infty$, and this removes the second term in the above equation. Equivalently we use the equation of state $b = b(T,z)$.
+\fi
+Restoring the dimensionality and including viscosity terms, we now have the following system of equations:
+\eqsyslab{
+	\pr_{t}\B{u} + \B{u}\cdot\nabla_{2}\B{u} + w\PD{\B{u}}{z} + \vec{f}\times\B{u} + \frac{1}{\rho_{0}}\nabla_{2} p'  & = \frac{1}{\rho_{0}}\nabla\cdot\tau  \label{eq:primeqmomentum}\\
+	\nabla_{2}\cdot\B{u} + \PD{w}{z} & = 0 \\
+	p'(\B{x},z,t) & = \rho_{0}g\eta(\B{x},t) + g\int_{z}^{0} \rho'(\B{x},z',t) dz' \\
+	\PD{\eta}{t} + \nabla_{2}\cdot\int_{-H}^{\eta} \B{u} dz &= 0 \label{eq:ssheta}\\ 
+	\rho' & = \rho'(T,z) \\
+	\pr_{t}T + \B{u}\cdot\nabla T + w\PD{T}{z} & = \frac{1}{\rho_{0}}\nabla\cdot F
+}{primitiveequations}
+These are the primitive equations of ocean dynamics \cite{adcroft_2004}. The terms  $\frac{1}{\rho_{0}}\nabla\cdot\tau $ and $\frac{1}{\rho_{0}}\nabla\cdot F$ are, respectively, viscosity and tracer diffusion terms, which will be specified later.
+\iffalse
+\subsection{Variational Derivation of Primitive Equations}
+
+We may also derive the set of primitive equations from a variational principle. Let us consider the following action functional:
+\eqnn{
+	S = \int dt \int d^{3}x \lrc{\Half\rho \abs{u}^{2} + \rho R\cdot u - \rho g z - \mathcal{E}(\rho,T)} 
+}
+where $\mathcal{E}$ is the internal energy of the fluid and $R$ is such that $\curl R = f$. If we apply the principle of least action $\delta S =0 $ to the above functional with variations constrained so that:
+\eqnn{
+	\delta u = \pr_{t}\xi + u\cdot\nabla\xi - \xi\cdot\nabla u \qquad \delta \rho = - \nabla\cdot(\rho\xi) \qquad \delta T = -\xi\cdot\nabla T
+}
+as per [Gay-Balmaz, Yoshimura 2019], then, imposing additionally the following auxiliary equations:
+\eqnn{
+	\pr_{t}\rho + \nabla\cdot(\rho u) = 0\qquad \pr_{t}T + u\cdot\nabla T = 0
+}
+as per [Holm, Marsden, Ratiu 1998] we would obtain the compressible Euler equation. \\
+\linebreak
+Now, to obtain the Primitive equations we make our approximations in the action. To do this we non-dimensionalise as before, but this time write $\rho = D(1+ b)$, and we shall impose via a Lagrange multiplier the condition $D=1$. With this our action takes the following form:
+\eqnn{
+	S =  \int dt \int d^{3}x \lrc{ \Half\eps D(1+b) u^{T}Au + D(1+b) R\cdot u -  \frac{1+b}{\eps \Fc} z - \mathcal{E}(D(1+b),T)} 
+}
+where $A = \lrb{\begin{array}{ccc}1&0&0\\0&1&0\\0&0&\al^{2} \end{array}}$. We then neglect all terms of order $\al^{2}$ and of order $b$, assuming that terms of order $\epsilon$ are larger than terms of order $b$. The result is the following:
+\eqnn{
+	S =  \int dt \int d^{3}x \lrc{ \Half\eps D u^{T}Au + D R\cdot u -  \frac{1+b}{\eps \Fc} z - \mathcal{E}(D,T) - \lambda(D-1)} 
+}
+Note that we do not neglect the buoyancy term because of the denominator of $1/\eps\Fc$. We now take the following variations:
+\eqnn{
+	\delta u = \pr_{t}\xi + u\cdot\nabla\xi - \xi\cdot\nabla u \qquad \qquad \delta D = -\nabla\cdot (\xi D) \qquad \delta b = -\xi\cdot\nabla b \qquad \delta T = -\xi\cdot\nabla T
+}
+So:
+\algnn{
+	\delta S &= \int dt  \lrc{\EXP{\eps DAu + DR,\pr_{t}\xi +u\cdot\nabla\xi-\xi\cdot\nabla u }  \color{white}\Half\color{black} \right. \\
+	& \qquad\left. \EXP{\frac{\eps}{2}u^{T}Au + R\cdot u - \PD{\mathcal{E}}{D} - \lambda - \frac{1+b}{\eps\Fc}z , -\nabla\cdot(\xi D)} \right. \\
+	& \qquad \left. +\EXP{ \frac{1}{\eps\Fc} Dz,\xi\cdot\nabla b} + \EXP{\PD{E}{T},\xi\cdot\nabla T} - \EXP{D-1,\delta\lambda}} \\
+	& = \int dt  \lrc{\EXP{- (\pr_{t} + \L_{u})(D\mu) + D\nabla\lrb{\Half\eps u^{T}\nabla Au + R\cdot u - \PD{E}{D} - \lambda - \frac{1+b}{\eps\Fc}z} \right.\right.\\
+	&\qquad\qquad \left.\left. D\frac{1}{\eps\Fc}z\nabla b + \PD{E}{T}\nabla T , \xi} + \EXP{D-1,\delta\lambda}}
+}
+where $\L_{u}$ is the Lie derivative, which obeys:
+\algnn{
+	\L_{u} D& = \nabla\cdot(uD) \\
+	\L_{u} \mu & = u\cdot\nabla\mu + \nabla u \cdot \mu
+}
+and $\mu:=\eps Au + R$. The resulting set of equations is therefore:
+\algnn{
+	(\pr_{t} + \L_{u})(D\mu) &= D\nabla\lrb{\Half\eps u^{T}\nabla Au + R\cdot u - \PD{E}{D} - \lambda - \frac{1+b}{\eps\Fc}z} +  D\frac{1}{\eps\Fc}z\nabla b + \PD{E}{T}\nabla T \\ 
+	(\pr_{t} + \L_{u})\lrb{D(1+b)} &= 0  \quad\implies\quad (\pr_{t} + \L_{u})D = 0\\
+	(\pr_{t} + \L_{u})T &= 0 \\
+	D &= 1
+}
+The second of these we approximate to lowest order by ignoring the terms containing a $b$, as these will be of lower order.  We can then combine the resulting equation with the first equation and use $D=1$ to get:
+\eqnn{
+	(\pr_{t} + \L_{u})\mu =\nabla\lrb{\Half\eps u^{T}\nabla Au + R\cdot u - p - \frac{1+b}{\eps\Fc}z} +  \frac{1}{\eps\Fc}z\nabla b 
+}
+where we have defined $p$ to be such that $\nabla p = \nabla\lrb{\PD{E}{D} + \lambda} - \PD{E}{T}\nabla T$.\\
+\linebreak
+Rearranging terms and separating horizontal and vertical components by $u = (\B{u},w)$ gives:
+\algnn{
+	\eps\lrb{\pr_{t}\B{u} + \B{u}\cdot\nabla\B{u} + w\PD{\B{u}}{z}} + fe_{3}\times\B{u} &= -\nabla_{2}p \\
+	0 & = -\PD{p}{z} - \frac{1+b}{\eps\Fc}
+}
+Additionally we have the equations coming from the advected quantities: the $D$ equation with $D=1$ gives the divergence-free condition $\nabla_{2}\cdot\B{u} + \PD{w}{z} = 0$, and the temperature equation becomes:
+\eqnn{
+	\pr_{t}T + \B{u}\cdot\nabla T + w\PD{T}{z} = 0
+}
+Moreover, we can integrate the divergence-free condition to get \cref{eq:ssheta} as before. 
+\fi

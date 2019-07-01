@@ -1,0 +1,248 @@
+ \documentclass[10pt]{article}
+
+\input{Preamble}
+
+\begin{document}
+\title{Differential Geometry: Definitions}
+\date{}
+\maketitle
+
+\section{Manifolds, Vector fields, $k$-forms}
+\defn{[Manifold]
+A set $\M$ is an $n$-dimensional \i{smooth manifold} if it satisfies the following properties:
+\begin{enumerate}[(i).]
+	\item $\M$ is a topological space.
+	\item There exist open sets $\O_{\al}$, which cover $\M$, and homeomorphisms (called \i{charts}) $\phi_{\al}: \O_{\al} \arr  U_{\al}$ such that the image $U_{\al}$ of $\phi_{\al}$ is an open subset of $\R^{n}$.
+	\item If $\O_{\al}\cap \O_{\be}\neq \emptyset$ then the map $\phi_{\al}\circ \phi_{\be}^{-1}: \phi_{\be}(\O_{\al}\cap \O_{\be}) \arr \phi_{\al}(\O_{\al}\cap \O_{\be})$.
+\end{enumerate}
+}
+\defn{[Smooth function]
+A function $f:\M\arr \R$ is said to be \i{smooth} if for every chart $\phi_{\al}$ the function $F_{\al} := f \circ \phi_{\al}^{-1} : U_{\al} \arr \R $ is smooth. 
+}\\
+\linebreak
+In practice we shall not distinguish between $f$ and $F_{\al}$, and we shall simply write $f(x)$ and assume that the chart is implicit. 
+\defn{[Curve on a manifold]
+A \i{curve on a manifold} is a map $\gamma : \R \arr \M$. $\gamma$ is \i{smooth} if for every chart $\phi_{\al}$, the curve $\phi_{\al}\circ \gamma : \R \arr U_{\al}$ is smooth.  
+} 
+\defn{[Tangent vector to a curve on a manifold]
+Let $\gamma$ be a smooth curve of a manifold $\M$ such that $\gamma(0) = p \in \M$. The \i{tangent vector} $X_{p}$ to the curve $\gamma$ at the point $p$ is a map $\C^{\infty}(\M) \arr \R$ defined by:
+\eqnn{
+	X_{p}(f) = \left. \D{}{t}\right|_{t=0} f(\gamma(t)) = X^{i}_{p}\PD{f}{x^{i}}(p) = \B{X}_{p}\cdot \nabla f (p)
+}
+where  $X_{p}^{i} = \dot{\gamma}(0)^{i}$ and we denote $\B{X}_{p} = (X_{p}^{1},...,X_{p}^{n})$ to be the components of  $X_{p}$.
+}
+\defn{[Tangent space at the point $p$]
+Let $p\in\M$. The \i{tangent space} to $\M$ a the point $p$, which we denote $T_{p}\M$, is defined to be the set of all tangent vectors at the point $p$. $T_{p}\M$ is a vector space isomorphic to $\R^{n}$, and its basis vectors are given, in a particular coordinate chart, by $\left.\PD{}{x^{i}}\right|_{p}$.
+}
+\defn{[Tangent bundle on $\M$]
+The tangent bundle to $\M$ is:
+\eqnn{
+	T\M = \lrc{(p,V) : p\in \M,  V\in T_{p}\M}
+}
+}
+\defn{[Vector field on $\M$]
+A vector field on $\M$ is a map which takes points $p\in\M$ to vectors $X_{p}\in T_{p}\M$. We may represent a vector field in terms of the coordinate basis as:
+\eqnn{
+	X = X^{i} \PD{}{x^{i}}
+}
+This acts on functions on $\M$ as a directional derivative:
+\eqnn{
+	X(f)(x) = X^{i}(x)\PD{f}{x^{i}}(x)
+}
+A vector field is \i{smooth} if $X(f)$ is a smooth function on $\M$ for all smooth functions $f$. \\
+The space of smooth vector fields on $\M$ is denoted $\mathfrak{X}(\M)$.
+}
+\defn{[Flow on $\M$]
+	A collection of maps $g_{t}: \M \arr \M$, for $t\in\R$, is called a \i{flow} if:
+	\begin{enumerate}
+		\item $g_{t}$ is a diffeomorphism for all $t$. That is, a smooth map with a smooth inverse.
+		\item $g_{0} = I$ for all $x\in \M$.
+		\item $g_{t}\circ g_{s} = g_{t+s}$.
+	\end{enumerate}	 
+}
+Note that there is a one-to-one correspondence between flows and vector fields. i.e. given a vector field $X$ we may define a flow $g_{t}x_{0}$ to be the solution to the following differential equation:
+\eqnn{
+	\D{}{t} x^{i}(t) = X^{i}(x(t)) \qquad x(0) = x_{0}
+}
+Conversely, given a flow $g_{t}$ we can define a vector field $X$ by, for $x\in \M$:
+\eqnn{
+	X(f)(x) = \left.\D{}{t}\right|_{t=0} f(g_{t}x) 
+}
+\defn{[Cotangent Space]
+Given a tangent space $T_{p}\M$, we define its dual $T^{*}_{p}\M$ to be the set of all linear functions $T_{p}\M\arr\R$. $T^{*}_{p}\M$ is called the \i{cotangent space}. This is also a vector space isomorphic to $\R^{n}$ and, given a particular coordinate representation, we can define basis vectors $dx^{i}$ by $dx^{i}\lrb{\PD{}{x^{j}}} = \delta^{i}_{j}$, where $\PD{}{x^{j}}$ are the basis vectors for $T_{p}\M$. 
+}
+\defn{[One-forms]
+	A \i{one-form} is a map which takes points $p\in\M$ to elements $T^{*}_{p}\M$. We can represent a general one-form in terms of the coordinate basis as:
+	\eqnn{
+		\al = \al_{i}dx^{i}
+	}
+	Then there is a natural pairing between one-forms and vector fields:
+	\eqnn{
+		\al(X)(x) = \al_{i}(x)dx^{i}\lrb{X^{j}(x)\PD{}{x^{j}}} = \al_{i}(x)X^{j}(x)\delta^{i}_{j} = \al_{i}(x)X^{i}(x) = \bs{\al}\cdot\B{X}
+	}
+	The space of one-forms is denoted by $\Lambda^{1}(\M)$
+}
+\defn{[Gradient]
+	Any smooth function $f:\M\arr\R$ defines a one form via:
+		\eqnn{
+			df := \PD{f}{x^{i}}dx^{i}
+		}
+		this one form is called the \i{gradient} of $f$.
+}
+\defn{[Tensor]
+	An $(r,s)$ \i{tensor} $T$ is a multi-linear map $T: (T_{p}^{*}\M)^{r}\otimes (T_{p}\M)^{s} \arr \R$. 
+	\linebreak
+	A basis for $(r,s)$ tensors is given by $ \PD{}{x^{j_{1}}} \otimes ... \otimes \PD{}{x^{j_{r}}} \otimes dx^{i_{1}}\otimes ... \otimes dx^{i_{s}}$ and in this basis $T$ has components $\tensor{T}{^{i_{1}...i_{r}}_{j_{1}...j_{s}}}$.\\
+	\linebreak
+	Thus, given $\al_{1},...,\al_{r}\in T_{p}^{*}\M$ and $X_{1},...,X_{s}\in T_{p}^{\M}$, we have:
+	\eqnn{ 
+		T(\al_{1},...,\al_{r},X_{1},...,X_{s})  = \tensor{T}{^{i_{1}...i_{r}}_{j_{1}...j_{s}}}(\al_{1})_{i_{1}},...,(\al_{r})_{i_{r}}X_{1}^{j_{1}}...X_{s}^{j_{s}}
+	}
+	We can define an $(r,s)$ \i{tensor field} to be a map from points $p\in\M$ to $(r,s)$ tensors.
+}
+\section{The Lie Derivative}
+\defn{ [Pull-back of a function]
+	Let $\psi : \M\arr \N$ be a diffeomorphism. Suppose $f:\N\arr\R$ is a smooth function on $\N$. We want to `pull $f$ back' so that we may view it as a function on $\M$. We therefore define the \i{pull-back} of $f$ by $\psi$ to be:
+	\eqnn{
+		(\psi{^{*}}f)(x) = f\circ \psi (x)
+	}
+}
+\defn{ [Push-forward of a vector field]
+	Let $X$ be a vector field on $\M$. We define the \i{push-forward} of $X$ by $\psi$ to be a vector field on $\N$ given by, for functions $f$ on $\N$:
+		\eqnn{
+			(\psi_{*}X)(f) = X(\psi^{*}(f))\circ \psi^{-1}
+		}
+}
+In terms of components and denoting $y = \psi(x)$, we have:
+\eqnn{
+	(\psi_{*}X)(f)(y) = (\psi_{*}X)^{i}(y)\PD{f}{y^{i}}(y) = X^{i}(x)\PD{f\circ\psi}{x^{i}} (x) = X^{i}(x)\PD{\psi^{j}}{x^{i}}(x)\PD{f}{y^{j}}(y)
+}
+Thus $(\psi_{*}X)^{i} = \lrb{X^{j}\PD{\psi^{i}}{x^{j}}}\circ \psi^{-1}$.
+\defn{[Pull-back of a one-form]
+	Let $\al$ be a one-form on $\N$. We define the \i{pull-back} of $\al$ by $\psi$ by, for any vector field $X$ on $\M$:
+	\eqnn{
+		(\psi^{*}\al)(X) = \al(\psi_{*}X)\circ \psi
+	}
+}
+We can similarly define the pull-back of a vector field and the push-forward of a one-form by using $\psi^{-1}$ instead of $\psi$. I.e. $(\psi^{-1})_{*} = \psi^{*}$ and $(\psi^{-1})^{*} = \psi_{*}$. Moreover, we can extend the definition to apply to any tensor field. That is, for an $(r,s)$ tensor $T$ defined on $\N$ we can define the pullback by:
+\eqnn{
+	(\psi^{*}T)(\al_{1},...,\al_{r},X_{1},...,X_{s}) = T(\psi_{*}\al_{1},...,\psi_{*}\al_{r}, \psi_{*}X_{1},...,\psi_{*}X_{s})\circ \psi
+}
+\defn{[Lie derivative]
+	Let $g_{t}$ be a flow on $\M$ with corresponding vector field $X$. Let $T$ be a tensor field on $\M$. We define $\L_{X}T$, the \i{Lie derivative} of $T$ along the vector field $X$ by:
+	\eqnn{
+		\L_{X}T = \left.\D{}{t}\right|_{t=0} (g_{t}^{*}T)
+	}
+}
+Note that the Lie derivative of an $(r,s)$ tensor field is also an $(r,s)$ tensor field. \\
+For example, the Lie derivative along $X$ of a vector field $Y$ is given by:
+\algnn{
+	(\L_{X}Y)(f)(x) & = \left.\D{}{t}\right|_{t=0} (g_{t}^{*}Y)(f)(x) \\
+					  & =  \left.\D{}{t}\right|_{t=0}  Y(f\circ g_{t}^{-1})(g_{t}x)  \\
+					  & = \left.\D{}{t}\right|_{t=0} Y^{i}(g_{t}x)\PD{f\circ g_{t}^{-1}}{x^{i}}(g_{t}x)  \\
+					  & = \left.\D{}{t}\right|_{t=0}Y^{i}(g_{t}x)\PD{f}{x^{j}}(x)\PD{(g_{t}^{-1})^{j}}{x^{i}}(g_{t}x) \\
+					   & = \left.\D{}{t}\right|_{t=0}Y^{i}(g_{t}x)\PD{f}{x^{j}}(x)\lrsq{\lrsq{\nabla g_{t}(x)}^{-1}}^{j}_{i} \\
+					  & = \left[(\dot{g}_{t}x)^{j}  \PD{Y^{i}}{x^{j}}(g_{t}x) \PD{f}{x^{i}}(x)\lrsq{\lrsq{\nabla g_{t}(x)}^{-1}}^{j}_{i}  - Y^{i}(x) \PD{f}{x^{j}}(x)\lrsq{\lrsq{\nabla g_{t}(x)}^{-1}}^{j}_{k}\lrsq{\nabla \dot g_{t}(x)}^{k}_{l}\lrsq{\lrsq{\nabla g_{t}(x)}^{-1}}^{l}_{i} \right]_{t=0} \\
+					  & = X^{j}  \PD{Y^{i}}{x^{j}}(x) \PD{f}{x^{i}}(x) - Y^{i}(x) \PD{f}{x^{j}}(x)\PD{X^{j}}{x^{i}}(x) \\
+					  & = \lrsq{X,Y}f(x)
+}
+Where we have used the fact that:
+\algnn{
+	\delta^{i}_{j} & = \PD{x^{i}}{x^{j}} = \PD{}{x^{j}} \lrsq{g_{t}^{-1}(g_{t}x)}^{i} \\
+					& = \lrsq{\PD{g_{t}^{-1}}{x^{k}}(g_{t}x)}^{i}\lrsq{\PD{g_{t}}{x^{j}}(x)}^{k}\\
+					& = \lrsq{\nabla g_{t}^{-1} (g_{t}x)}^{i}_{k}\lrsq{\nabla g_{t}(x)}^{k}_{j}\\
+					\implies\qquad &\PD{(g_{t}^{-1})^{j}}{x^{i}}(g_{t}x) = \lrsq{\lrsq{\nabla g_{t}(x)}^{-1}}^{j}_{i}
+}
+and that for a matrix $A(t)$, we have $\D{}{t} A^{-1}(t) = - A^{-1}(t)\dot{A}(t)A^{-1}(t)$. \\
+We conclude that:
+\eqnn{
+	\L_{X}Y = [X,Y]
+}
+That is, the Lie derivative of a vector field is given by the \i{vector field commutator}, which is explicitly defined by:
+\eqnn{
+	[X,Y] = \lrb{X^{i}\PD{Y^{j}}{x^{i}} - Y^{i}\PD{X^{j}}{x^{i}}}\PD{}{x^{i}}
+}
+
+\section{Group actions on Manifolds}
+\defn{[Group Action]
+	Let $G$ be a group. $G$ is said to \i{act on} $M$ if there exists a map $\Phi : G\times \M \arr$ such that:
+	\begin{enumerate}[(i).]
+		\item If $e$ is the identity element of $G$ then $\Phi(e,p) = p$ for all $p\in \M$. 
+		\item For $g_{1},g_{2}\in G$ we have $\Phi(g_{1}, \Phi(g_{2},p)) = \Phi(g_{1}g_{2},p)$.
+	\end{enumerate}
+	Usually we do not write the group action in terms of $\Phi$ and simply denote $gp = g(p) := \Phi(g,p)$. Then the second condition above becomes $g_{1}(g_{2}p) = (g_{1}g_{2})p$.  
+}
+Effectively this definition means that every element of $G$ defines a map from the manifold $\M$ to itself. 
+\defn{[Lie Group]
+	A \i{Lie group} is a group that is also a manifold.
+}\\
+\linebreak
+Note that the space of all diffeomorphisms on $\M$ forms a Lie group, albeit an infinite-dimensional one. A flow is a smooth curve on the space of diffeomorphisms. 
+\defn{[Lie algebra of a Lie group]
+	If $G$ is a Lie group then the tangent space to $G$ at the identity element is called the \i{Lie algebra} of $G$ and this is denoted $\mathfrak{g} = T_{e}G$. 
+}
+\section{The Diamond Operator}
+If $G=\text{Diff}(\M)$, the space of all diffeomorphisms on $\M$, then its Lie algebra is the space of vector fields on $\M$. \\
+\defn{[Diamond operator]
+	Let $V$ be some space of tensors on $\M$ with dual $V^{*}$. Let $ \mathfrak{X}(\M)$ be the space of vector fields on $\M$. Then for $p\in V^{*}$ and $q\in V$ we define the \i{diamond} $p\diamond q \in \mathfrak{X}^{*}(\M)$ such that for all $\xi\in\mathfrak{X}(\M)$
+	\eqnn{
+		\EXP{p\diamond q, \xi}_{\mathfrak{X}^{*}(\M)\times\mathfrak{X}^{*}(\M)} = \EXP{p,-\L_{\xi}q}_{V^{*}\times V}
+	}
+}
+
+\section{Exterior Derivative}
+We have already defined the gradient of a function $df (x) = \PD{f}{x^{i}}(x)dx^{i}$, and this is given by a 1-form. We can generalise the definition of the operator $d$ as follows. 
+\defn{[$k$-form]
+	A $k$-form is an antisymmetric $(0,k)$ tensor. On an $n$-dimensional manifold a basis for $k$-forms ($k\leq n$) is given by:
+	\eqnn{
+		dx^{i_{1}}\wedge ... \wedge dx^{i_{k}}
+	}
+	where the \i{wedge product} is defined by:
+	\eqnn{
+		dx\wedge dy = 2\lrb{dx\otimes dy - dy\otimes dx}
+	}
+	And a general $k$-form is written as:
+	\eqnn{
+		\al = \frac{1}{k!}\al_{i_{1}...i_{k}}dx^{i_{1}}\wedge ... \wedge dx^{i_{k}}
+	}
+	In terms of the basis for $(0,k)$ tensors this is:
+	\eqnn{
+		\al = \al_{i_{1}...i_{k}}dx^{i_{1}}\otimes ... \otimes dx^{i_{k}}
+	}
+	where $\al_{i_{1}...i_{k}}$ is antisymmetric in its indices.
+}
+\defn{[Exterior derivative]
+	Let $\al\in \Lambda^{k}(\M)$ be a $k$-form. We define the \i{exterior derivative} $d:\Lambda^{k}(\M) \arr \Lambda^{k+1}(\M)$ by:
+	\algnn{
+		d\al & = d\lrb{\frac{1}{k!}\al_{i_{1}...i_{k}}dx^{i_{1}}\wedge...\wedge dx^{i_{k}}} \\
+				& = \frac{1}{k!}\pr_{j}\al_{i_{1}...i_{k}}dx^{j}\wedge dx^{i_{1}}\wedge...\wedge dx^{i_{k}}
+	}
+}
+Note that $d^{2} = 0$. \\
+\linebreak
+Furthermore, we have Cartan's formula:
+\eqnn{
+	\L_{X}\al = i_{X}(d\al) + d(i_{X}\al) 
+}
+where $i_{X}\al = \al(X, \cdot , ..., \cdot)$ is a $(k-1)$-form if $\al$ is s $k$-form.  \\
+\linebreak
+From this we can prove another important property, namely that $d$ commutes with the Lie Derivative:
+\eqnn{
+	d(\L_{X}\al) = d(i_{X}d\al) = \L_{X}d\al
+}
+\section{Integration on Manifolds}
+
+\defn{[Integration]
+Let $\O\subset\M$ have a chart $\psi : \O \arr \R^{n}$. Let $\omega$ be an $n$-form on $\M$. We define the \i{integral} of $\omega$ over $\O$ to be:
+\eqnn{
+	\int_{\O} \omega = \int_{\psi(\O)}\omega_{1...n}(\psi^{-1}(x))dx^{1}...dx^{n}
+}
+\defn{[Embedding]
+Let $\M$, $\N$ be manifolds of dimension $m,n$ respectively with $m<n$. An \i{embedding} of $\M$ into $\N$ is a smooth, one-to-one map $\phi:\M\arr\N$.
+}
+We may therefore evaluate the following integral, for an $m$-form $\eta$ defined on $\N$:
+\eqnn{
+	\int_{\phi(\M)}\eta = \int_{\M}\phi^{*}\eta
+}
+}
+\end{document}

@@ -1,0 +1,69 @@
+\documentclass[10pt]{article}
+
+\input{../Preamble}
+
+\begin{document}
+\title{FESOM2}
+\date{}
+\maketitle
+\section{Model and spatial discretisation}
+Let $V_{t}$ be a volume moving with velocity $\hat{\B{v}}$. Consider a fluid with velocity vector field $\b{u} = (u,v,w)$. Conservation of momentum for this fluid gives:
+
+\eqnn{
+	\D{}{t} \int_{V_{t}} \rho \B{u}_{3} d^{3}x + \int_{\pr V_{t}} \rho \B{u}_{3} \lrb{\B{u}_{3} - \hat{\B{v}}}\cdot \B{n} dS = \int_{V_{t}} \B{f} d^{3}x + \int_{\pr V_{t}} \sigma \B{n} dS
+}
+where $\B{f}$ is the external body force per unit volume and $\sigma$ is the stress tensor, which we will take equal to $-p\mathbb{I}$. We use $\B{u}_{3} : = (u,v,w)$, and take $\B{u} = (u,v)$ to be the horizontal velocity. Now let us assume that $\hat{v} = (0,0,\hat{w})$, i.e. the volume moves only in the vertical direction. Moreover, assume that the volume $V_{t}$ is a vertical triangular prism with top and bottom of area $A$. Then split the integrals as follows:
+\algnn{
+	& \D{}{t} \int_{A} \lrb{\int_{z_{-}}^{z_{+}} \rho \B{u}_{3} dz} dS + \oint_{\pr{A}} \lrb{\int_{z_{-}}^{z_{+}} \rho \B{u}_{3} \B{u}_{3}\cdot\B{n} dz} dl + \int_{A} \lrb{\lrb{\rho\B{u}_{3}\tl{w}}_{+} - (\rho\B{u}_{3}\tl{w})_{-}}dS \\
+	& \qquad  = \int_{A}\lrb{\int_{z_{-}}^{z_{+}} \B{f} dz}dS - \oint_{\pr A} \lrb{\int_{z_{-}}^{z_{+}}p\B{n} }dl - \int_{A} \lrb{(p\B{n})_{+} - (p\B{n})_{-} } dS
+}
+where $\tl{w} = (\B{u} - \hat{\B{v}})\cdot\B{n}$. Note that this may be different from $w-\hat{w}$ if the top or bottom of the prism is not flat. Now let us denote by an overbar the average in the $z$-direction: $\bar{f} : = \tfrac{1}{h}\int_{z_{-}}^{z_{+}} f dz$, where $h = z_{+} - z_{-}$ (note that $h = h(x,y,t)$). 
+\algn{
+	& \D{}{t} \int_{A} h \ol{ \rho \B{u}_{3}}  dS + \oint_{\pr{A}}h\ol{\rho \B{u}_{3} \B{u}_{3}\cdot\B{n}} dl + \int_{A} \lrb{\lrb{\rho\B{u}_{3}\tl{w}}_{+} - (\rho\B{u}_{3}\tl{w})_{-}}dS \nonumber\\ 
+	& \qquad  = -\int_{A}h \ol{\rho f\B{e}_{3}\times \B{u}_{3}}dS - \int_{A}h \ol{\rho }g\B{e}_{3}dS - \oint_{\pr A} h\ol{p\B{n}} dl - \int_{A} \lrb{(p\B{n})_{+} - (p\B{n})_{-} } dS
+}
+where we have also set $\b{f} := -\rho f\B{e}_{3}\times \B{u} - \rho g \B{e}_{3}$, that is Coriolis force plus gravity. Now let us implement the hydrostatic approximation:
+\algnn{
+	\rho(x,y,z,t) &= \rho_{0} + \rho'(z) \qquad \rho' \ll\rho_{0} \\
+	 \PD{p}{z} &= -g\rho
+}
+These assumptions give the following result:
+\algn{
+	& \D{}{t} \int_{A} h \ol{\B{u}}  dS + \oint_{\pr{A}}h\ol{ \B{u} \B{u}}\cdot\B{n} dl + \int_{A} \lrb{\lrb{\B{u}\tl{w}}_{+} - (\B{u}\tl{w})_{-}}dS \nonumber\\ 
+	& \qquad  = -\int_{A}h \ol{ f\B{e}_{3}\times \B{u}}dS  - \frac{1}{\rho_{0}}\oint_{\pr A} h\ol{p}\B{n}_{2} dl - \B{P}
+}
+The meaning of $\B{P}$ has something to do with the fact that the ends of cells are not horizontal, thus introducing an extra term coming from the horizontal component of the hydrostatic balance term. Notice that the above equation is in terms of horizontal velocity only. \\
+\linebreak
+Now suppose the whole space is partitioned into cells of the form of $V_{t}$, and label these cells by $k$. We define $\B{U} : = h\B{u}$ and make the following discretisation assumption:
+\eqnn{
+	 \frac{1}{A}\int_{A} h \ol{\B{u}}  dS \approx    h(x_{c},y_{c},t)\ol{\B{u}}(x_{c},y_{c},t) \approx   h(x_{c},y_{c},t)\B{u}\lrb{x_{c},y_{c}, \frac{z_{+} + z_{-}}{2},t} := \B{U}^{k}(t)
+}
+where $(x_{c},y_{c})$ is the position of the centre of the area $A$. Moreover, we write:
+\eqnn{
+	\frac{1}{A} \oint_{\pr{A}}h\ol{ \B{u} \B{u}_{3}}\cdot\B{n} dl \approx \frac{1}{4A}\sum_{e(A)} l_{e}\lrb{\sum_{v(e)} \B{n}_{e}\cdot (\B{U})_{v}^{k}}\lrb{\sum_{v(e)}\B{u}_{v}^{k}} =: \nabla\cdot(h_{k}(\B{u})_{k}\otimes\B{u}_{k})
+}
+where we have defined:
+\eqnn{
+	 \B{U}_{v}^{k}: = \frac{1}{A_{v}}\sum_{c(v)} \B{U}^{k}_{c}A_{c}/3 
+}
+where $A_{v} :  = \frac{1}{3}\sum_{c(v)} A_{c}$ is the area of the dual cell with vertex $v$ at its centre. Moreover, $\B{u}^{k} : = \B{U}^{k}/h^{k}$ and $h_{c} = \frac{1}{3}\sum_{v(c)} h_{v}$.\\
+\linebreak
+Moreover:
+\eqnn{
+	\frac{1}{A}\int_{A} \lrb{\lrb{\B{u}\tl{w}}_{+} - (\B{u}\tl{w})_{-}}dS \approx \B{u}_{+}\tl{w}_{+} - \B{u}_{-}\tl{w}_{-} 
+}
+Here we calculate:
+\eqnn{
+	\B{u}_{+}^{k} = \Half\lrb{\B{u}^{k} + \B{u}^{k-1}} \qquad  \B{u}_{-}^{k} = \Half\lrb{\B{u}^{k+1} + \B{u}^{k}}
+}
+And:
+\eqnn{
+	\tl{w}_{+}^{k} = \frac{1}{3}\sum_{v(c)}\tl{w}^{k}_{v} \qquad \tl{w}_{-}^{k} = \frac{1}{3}\sum_{v(c)}\tl{w}^{k+1}_{v} = \tl{w}_{+}^{k+1}
+}
+Furthermore, we have:
+\eqnn{
+	\frac{1}{A}\oint_{\pr A} h\ol{p}\B{n} /\rho_{0}dl \approx \frac{1}{A_{c}} \sum_{e(c)}l_{e}\B{n}_{e}\sum_{v(e)}h_{v}p_{v}/2 =: \nabla(hp)/\rho_{0}
+}
+\section{Time Stepping}
+
+\end{document}

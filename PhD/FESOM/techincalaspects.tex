@@ -1,0 +1,98 @@
+\documentclass[10pt]{article}
+
+\input{../Preamble}
+
+\begin{document}
+\title{FESOM2.0: Technical Aspects}
+\date{}
+\maketitle
+\section*{Friday 8/2/2019}
+The code is running for much longer than it should. 
+\eqnn{
+	\Delta t = \frac{1}{96}\text{day} \qquad \text{\# cells} = 38398 \qquad \text{\# vertical layers} = 24
+}
+Specifically, running for 10 years on 32 CPUs takes $393854s \approx 109hrs$.
+\section*{Tuesday 12/2/2019: Test runs}
+
+We run the code for one day on two CPUs with the same mesh and time-step described above:
+
+Total run time = $1439s \approx 24min$. From this we predict that the model, when run for 10 years on 32 CPUs should take $365\times 10/16$ times as long, i.e. $91.25 hrs$. This estimate is of the same order of magnitude as the actual running time, so this makes sense.  \\
+\linebreak
+Running again for a day but this time on 32 CPUs gives a run time of $106s$. Note that $1439/16 \approx 90$, so this gives approximately the right scaling with CPU number.  
+
+\section*{Wednesday 13/2/2019}
+
+Let us integrate over a day on varying numbers of CPUs with an allocation of $2\text{GB}$ per CPU and the same specifications as above. We display the results below:
+
+\begin{itemize}
+\item 2 CPUs:  $1554.704s \approx 26min$. 
+\item 4 CPUs: $599.1404s \approx 10min$.
+\item 8 CPUs: $423.3595s \approx 7min$.
+\item 16 CPUs: $224.6756s \approx 4min$.
+\item 32 CPUs: $107.1845s \approx 2min$.
+\end{itemize}
+
+Integrating the code over ten days scales as follows:
+\begin{itemize}
+\item 2 CPUs:  $15624.89\approx 260min$
+\item 4 CPUs: $8232.239\approx 137min$.
+\item 8 CPUs: $4256.799\approx 71min$.
+\item 16 CPUs: $2324.895\approx 39min$.
+\item 32 CPUs: $1071.855\approx 18min$.
+\end{itemize}
+
+\section{Results from long run}
+
+In the run with the aforementioned parameters over ten physical years we find the following: 
+
+\section{Model Set-Up}
+
+The equations of motion being solved are:\\
+\linebreak
+We use a wind forcing of a latitude-dependent cosine wave, constant in time and longitude. Something like $0.2*\cos(\al(y-y_{0}))$\\
+\linebreak
+So the curl of the wind forcing is given by a sine wave.\\
+\linebreak
+And thermal forcing:\\
+There is currently no thermal forcing, just a pre-determined initial temperature.\\
+\linebreak
+The discretisation in space is given by:\\
+\linebreak
+And in time:\\
+\linebreak
+The ALE scheme is implemented according to:\\
+Not currently available as output\\
+\linebreak
+The equation of state is:\\
+linear; but density can be chosen as output in io\textunderscore meandata. \\
+\linebreak
+Boundary conditions implemented currently are:\\
+No slip. Possible to enable free slip though (see namelist.oce). There is also bottom drag with amplitude defined in namelist.oce. This file also has parameterisations: currently harmonic leith with biharmonic background. the file oce\textunderscore dyn.f90 has further options for parameterisations.\\
+\linebreak
+Other possible boundary conditions:
+\begin{itemize}
+	\item No slip?\\
+	\item Free slip?\\
+	\item Partial slip?--Not available
+\end{itemize}
+Other parameters:
+\begin{itemize}
+	\item Viscosity.
+	\item 
+\end{itemize}
+There is a forced rotation option in the namelist.config file. This has the effect of...\\
+\linebreak
+Is salinity disabled?\\
+\linebreak
+Are initial conditions from rest?\\
+\linebreak
+Are outputs monthly averages?\\
+Yes\\
+\linebreak
+What is abg?\\
+Rotation of mesh. Should be set to zero. \\
+\linebreak
+How do we get corresponding physical position from mesh data?
+
+
+\end{document}

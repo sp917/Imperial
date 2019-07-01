@@ -1,0 +1,362 @@
+The Finite-volumE Sea ice-Ocean Model (FESOM2.0, see \cite{danilov_sidorenko_wang_jung_2016}) solves the primitive equations \cref{eq:primitiveequations} using a finite-volume discretisation in space in which the domain is split into cells, each of which is a triangular prism with the triangles lying horizontally; in the vertical direction the domain is split into layers, the heights of which may vary according to an ALE scheme, see \cite{donea_huerta_ponthot_rodriguez-ferran_2004}. More complete information about FESOM2.0 can be found in \cite{danilov_sidorenko_wang_jung_2016}; here we include a summary of the most important points relevant to our set-up.\\
+\indnt The FESOM2.0 model is a global ocean model with coupling to sea ice; however, for our purposes we shall use a simplified set-up in which the domain is a rectangular box with free-slip imposed at the boundaries; we do not take ice or salinity into account and we choose the `linear free-surface' option for the ALE scheme, which effectively keeps the layer heights fixed, but still allows the sea-surface height to vary.
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{mesh.jpg}
+    \captionsetup{width=.8\linewidth}
+  \caption{\footnotesize A section of the horizontal grid discretisation at $1/8^\circ$  horizontal resolution}
+\end{subfigure}%
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{mesh_vertical.jpg}
+    \captionsetup{width=.8\linewidth}
+  \caption{ \footnotesize A section of the grid showing vertical discretisation. Resolution is finer at the top of the domain. }
+\end{subfigure}
+\end{figure}
+
+The equations of motion in layer $k$ are given by:
+\eqsyslab{
+	&\PD{}{t}\lrb{\B{U}_{k}}  + \nabla\cdot(\B{U}_{k}\B{u}_{k}) +  \B{u}_{k_+}w_{k_+} - \B{u}_{k_-}w_{k_-}   + f e_{3}\times \B{U}_{k}  +  \frac{1}{\rho_{0}}h_{k}\nabla p = D_{U} + (\nu_{v}\pr_{z}\B{u})_{k_+} - (\nu_{v}\pr_{z}\B{u})_{k_-}  \label{eq:momentum}\\
+	&\nabla\cdot\B{U}_{k} + \lrsq{w_{k_+} - w_{k_-}} = 0 \label{eq:continuity}\\
+	&\PD{\eta}{t} + \nabla\cdot\sum_{k}\lrb{\B{U}_{k}} = 0 \label{eq:ssh}\\
+	& p'(\B{x},z,t) =   g\rho_{0}\eta(\B{x},t) + g\int_{z}^{0}\rho'(\B{x},z',t)dz' \label{eq:pressureeq}\\
+	&\rho' = \rho'(p',T) \label{eq:eos}\\
+	&\pr_{t}(h_{k} T_{k}) + \nabla\cdot(\B{U}_{k}T_{k}) + w_{k_+}T_{k_+} - w_{k_-}T_{k_-} = \nabla\cdot\lrb{h_{k}K\nabla T_{k}} \label{eq:tracer}
+}{eqsofmotion}
+where $\B{U}_{k} := h_{k}\B{u}_{k}$, $h_{k}$ is the thickness of layer $k$ and subscript $\pm$ denotes the top or bottom of the layer respectively. $D_{U}$ is the horizontal viscosity term, which will be specified later, and $K$ is the tracer diffusion tensor. The equation of state used is a Jackett-McDougall equation \cite{jackett_mcdougall_1995}. 
+
+\subsection{Spatial Discretisation}
+The positioning of variables is done according to an Arakawa B-grid, so that horizontal velocities are located at the centre of each cell; vertical velocities are at the vertices of each cell; all other quantities ($\rho', T, \eta, p'$, etc) are located at the midpoint of the cell in the vertical direction, but at the vertices in the horizontal direction. 
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{0.45\textwidth}
+  \includegraphics[width=0.6\linewidth]{cell1.png}
+    \captionsetup{width=.8\linewidth}
+  \caption{\footnotesize One cell in the discretised domain with positions at which each quantity is defined.}
+  \end{subfigure}%
+  \begin{subfigure}{0.45\textwidth}
+   \includegraphics[width=0.8\linewidth]{vertex_cell.png}
+   \captionsetup{width=.8\linewidth}
+   \caption{The vertex cell is the interior of the red line, which connects the centre of each cell to the midpoint of its adjacent edges.} 
+   \label{fig:vertexcell}
+  \end{subfigure}
+\end{figure}
+At each vertex we may define a vertex cell, as shown in \cref{fig:vertexcell}. If $A_{c}$ is the area of cell $c$ then the area of the vertex cell is given by:
+\eqnn{
+	A_{v} = \frac{1}{3} \sum_{c\in C(v)} A_{c}
+}	
+where $C(v)$ is the set of cells surrounding vertex $v$. \\
+\linebreak
+To evaluate, for example, the horizontal divergence terms in \cref{eq:eqsofmotion} we integrate over a vertex cell with area $A_{v}$:
+\eqnn{
+	\lrsq{\nabla\cdot\lrb{\B{U}\B{u}}}_{v} \approx \frac{1}{A_{v}}\int_{A_{v}} \nabla\cdot\lrb{\B{U}\B{u}} dS  \approx \frac{1}{A_{v}}\sum_{e\in E(v)} \sum_{c\in C(e)} \B{U}_{c}\b{u}_{c}\cdot \B{n}_{ec}d_{ec}
+}
+where $E(v)$ is the set of edges connected to vertex $v$ and $C(e)$ the set of cells bordering edge $e$. $d_{ec}$ is the distance between the midpoint of edge $e$ and the centre of cell $c$, and $\B{n}_{ec}$ is the outward pointing normal to the line connecting the midpoint of edge $e$ and the centre of cell $c$. The above expression gives the momentum flux as defined at cell vertices. Therefore we need to average to get the flux on cell centres:
+\eqnn{
+	A_{c}\lrsq{\nabla\cdot\lrb{\B{U}\B{u}}}_{c} = \frac{1}{3}\sum_{v\in V(c)} A_{v}\lrsq{\nabla\cdot\lrb{\B{U}\B{u}}}_{v}
+}	
+where $V(c)$ is the set of vertices surrounding cell $c$ and $A_{c}$ the area of cell $c$.\\
+\linebreak
+The other horizontal gradient terms are calculated similarly, e.g., the pressure gradient is given by:
+\eqnn{
+	(\nabla p)_{c} \approx \frac{1}{A_{c}} \sum_{e\in E(c)} l_{e}\B{n}_{e}p_{e} = \frac{1}{A_{c}} \sum_{e\in E(c)} l_{e}\B{n}_{e}\sum_{v\in V(e)}p_{v}/2 
+}
+where $l$ is the length of edge $e$, $\B{n}_{e}$ is the outward pointing normal to edge $e$, $E(c)$ is the set of edges around cell $c$, and $V(e)$ is the set of vertices connected to edge $e$.
+\subsection{Time-Stepping}
+To step forwards in time we write \cref{eq:momentum} in the following, simplified form:
+\eqnn{
+	\pr_{t}\B{U}_{k} = \B{R}_{k} - gh_{k}\nabla\eta + \lrb{\nu_{v}\pr_{z}\B{u}}_{k_{+}} - \lrb{\nu_{v}\pr_{z}\B{u}}_{k_{-}}
+}
+where $\B{R}_{k}$ contains the advection, Coriolis and horizontal viscosity terms, as well as the remaining part of the pressure. We may also write $\B{R}_{k} = \B{R}_{k}^{*} - h_{k}(\nabla p_{h})_{k}/\rho_{0}$, where $p_{h} = g\int_{0}^{z}\rho'(\B{x},z',t) dz'$. The forward time-stepping is therefore as follows:
+\eqlab{
+		\B{U}^{n+1}_{k} - \B{U}^{n}_{k} = \Delta t \lrb{\B{R}_{k}^{n+1/2} + \lrsq{\nu_{v}\pr_{z}\B{u}^{n+1}}^{k_+}_{k_-} - gh_{k}\nabla\lrb{\theta\eta^{n+1} + (1-\theta)\eta^{n}}}
+}{momentumstep}
+where $\theta$ is an implicitness parameter, which in the current set-up is taken to be equal to $1$. To calculate $\B{R}_{k}^{n+1/2}$ we use an Adams-Bashforth step:
+\eqnn{
+\B{R}_{k}^{n+1/2} = \frac{3}{2}(\B{R}_{k}^{*})^{n} - \Half (\B{R}_{k}^{*})^{n} - h_{k}(\nabla p_{h})_{k}^{n}/\rho_{0}
+}
+%\color{red} The above needs checking: are $n$ indices correct? \color{black}\\
+%\linebreak
+To solve \cref{eq:momentumstep} we split it into a predictor and corrector step.  We set $\Delta \B{U}_{k} : = \B{U}^{*}_{k} - \B{U}^{n}_{k}$, then we use as the predictor step:
+\eqlab{
+	\Delta \B{U}_{k} -  \frac{1}{h_{k}}\lrsq{\nu_{v}\pr_{z}\Delta\B{U}}^{k_+}_{k_-}= \Delta \tl{\B{U}}_{k}  + \frac{1}{h_{k}}\lrsq{\nu_{v}\pr_{z}\B{U}^{n}}^{k_+}_{k_-}
+}{deltaU}
+where $\Delta\tl{\B{U}}_{k} : = \Delta t\lrb{\B{R}_{k}^{n+1/2} - gh_{k}\nabla\eta^{n}}$. \\
+\linebreak
+Now let us denote by an overbar the sum over layers, i.e. $\ol{\B{U}}: = \sum_{k}\B{U}$. Then, if we assume that $\pr_{z}\B{U} = 0$ at the top and bottom of the ocean (which follows from the free-slip boundary condition), we may deduce from \cref{eq:momentumstep}:
+\eqnn{
+	\bar{\B{U}}^{n+1} - \bar{\B{U}}^{n} = \ol{\Delta\B{U}} - g\Delta t \theta (H + \eta^{n+1/2})\nabla\lrb{\eta^{n+1} - \eta^{n}}
+}
+where $H = \sum_{k} h_{k}$. \\
+\linebreak
+Now, we can discretise the $\eta$ equation as:
+\eqnn{
+	\eta^{n+1} - \eta^{n} = - \Delta t \nabla\cdot \lrb{\al \bar{\B{U}}^{n+1} + (1-\al)\bar{\B{U}}^{n}}
+}
+where $\al$ is another implicitness parameter, which we also take to be $1$. We can then combine these two equations to get:
+\eqlab{
+	\eta^{n+1} - \eta^{n} -g\Delta t^{2}\theta\al\nabla\cdot\lrb{(H + \eta^{n+1/2})\nabla(\eta^{n+1} - \eta^{n})} = -\Delta t\nabla\cdot \lrb{\bar{\B{U}}^{n} + \al\ol{\Delta\B{U}}}
+}{etastep}
+The corrector step may then proceed as:
+\eqlab{
+	\B{U}^{n+1} - \B{U}^{n} = \Delta\B{U} - gh\Delta t \theta\nabla(\eta^{n+1} - \eta^{n})
+}{corrector}
+Note that the viscosity contribution in the corrector step is ignored.
+To summarise, the time-stepping process is as follows:
+\begin{itemize}
+	\item Do the predictor step to get $\Delta\B{U}$ from \cref{eq:deltaU}.
+	\item Step $\eta$ forward in time via  \cref{eq:etastep} to get $\eta^{n+1}$.
+	\item Do the corrector step \cref{eq:corrector} to get $\B{U}^{n+1}$. 
+	\item Calculate vertical velocities by integrating the divergence-free condition: $w_{k_+}^{n+1} - w_{k_-}^{n+1} = -\nabla\cdot\B{U}^{n+1}_{k}$.
+	\item Advect the tracers.
+	\item Calculate $\rho'$ from the equation of state and integrate to get the pressure.
+\end{itemize}
+
+\subsection{Model Set-Up} \label{sec:fesomsetup}
+
+We use the rectangular box set-up as a toy model for a wind-driven double gyre in the North-Altantic. Therefore we take the Coriolis parameter to be:
+\eqnn{
+	f = 2\Omega_{0}\sin y
+}
+where $\Omega_{0} = 1/\text{day}$ is the rotation rate of the earth, and $y$ takes values between $30^\circ$ and $60^\circ$ latitude. In the $x$-direction we use longitudes between $0$ and $40^\circ$. The vertical depth of the domain is $1600\text{m}$, split into 23 layers at heights, in metres, of 0, 10, 22, 35, 49, 63, 79, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600. \\
+\linebreak 
+Moreover, in order to generate the double gyre we use a wind forcing given by:
+\eqlab{
+	\tau_{x} = -\tau_{0}\cos\lrb{\frac{\pi}{15}(y-\Delta)}1_{y>30^{\circ} + \Delta} \qquad \tau_{y} = 0
+}{windforcing}
+The viscosity consists of a background viscosity added to a modified Leith viscosity. This is calculated on cell $c$ according to:
+ \eqnn{
+ 	A_{c}(D_{U})_{c} = \Half \sum_{e\in E(c)} \lrb{\nu_{n(e)} + \nu_{c}}\lrb{\B{U}_{n(e)} - \B{U}_{c}}l_{e}/\abs{\B{r}_{c n(e)}} 
+ }
+where $n(e)$ denotes the cell that shares edge $e$ with cell $c$, $l_{e}$ is the length of edge $e$ and $\B{r}_{c n(e)}$ is the vector connecting the centroids of cells $c$ and $n(e)$. The viscosities $\nu_{c}$ are modified Leith viscosities calculated as:
+\eqnn{
+	\nu_{c} =0.2 \min\lrc{\nu_{h}\lrb{\tfrac{A_{c}}{A_{0}}} + A_{c}^{3/2}\sqrt{\nu_{\text{div}}\abs{\nabla (e_{3}\cdot \curl \B{U})}^{2} + \nu_{\text{Leith}}\abs{\nabla\Div\B{U}}^{2}}, A_{c}/\Delta t}
+}
+$\nu_{h}$ is the horizontal viscosity coefficient, $A_{c}$ the area of cell $c$, $A_{0}$ the reference area by which we scale the viscosity and $\nu_{\text{Leith}}$ and $\nu_{\text{div}}$ are the Leith and modified Leith viscosity, respectively. The viscosity is bounded above by $0.2A_{c}/\Delta t$\\
+\linebreak
+We start our simulation from an initial temperature profile given by:
+\eqnn{
+	T(z) = T_{0} + \beta\tanh\lrb{\frac{z-z_{0}}{\lambda}} + \frac{z}{h}
+}
+where $T_{0},\beta,z_{0},\lambda,h$ are some parameters to be specified later. \\
+\linebreak
+There is also a bottom drag forcing given by specifying the vertical viscosity at the bottom to be:
+\eqnn{
+	\left. \nu_{v}\pr_{z}\B{u} \right|_{bottom} = C_{d}\B{u}\abs{\B{u}}
+}
+\subsection{Model Parameters} \label{sec:fesomparams}
+
+The main parameters used in our model set-up are summarised in the following table:
+
+\begin{table}[H]        
+	\centering
+		\begin{tabular}{|c|c|c|c|}
+			\hline
+				    Parameter	 	& 		Value	&  Interpretation	& Units\\
+			\hline
+				    		$C_{d}$	 &			0.001			     & 		\text{Bottom drag coefficient}		&	\text{none}	\\
+				    		 $\nu_{v}$	 &			$10^{-4}$				& 		\text{Vertical viscosity}	 & $m^{2}s^{-1}$	\\
+				      	$\nu_{h}$	 &				2000			& 			\text{Background horizontal viscosity}							&		 $m^{2}s^{-1}$				\\
+				      	$\nu_{\text{div}}$ 	&		5					&			\text{Modified Leith viscosity	}		&	 \text{none}\\
+				      	$\nu_\text{Leith}$		&		0.5				&			\text{Strength of Leith viscosity} 	&	 \text{none} \\
+				      	$A_{0}$	&		$5.8\times 10^{9}$ &		\text{Reference area for viscosities}  &  $m^{2}$\\
+				      	$\rho_{0}$    &		1025				&			\text{Background water density}  	& $kg m^{-3}$ \\
+				      	$x_{min}$	    &		0					&			\text{Longitude of western boundary} & ${}^{\circ}$ \\
+				      	$x_{max}$	    &		40					&			\text{Longitude of eastern boundary} & ${}^{\circ}$ \\
+				      	$y_{min}$	    &		30					&			\text{Latitude of southern boundary} & ${}^{\circ}$ \\
+				      	$y_{max}$	    &		60					&			\text{Longitude of Northern boundary} & ${}^{\circ}$ \\
+				      	$\Delta x$					&		 1/8				&			\text{Horizontal distance between adjacent nodes} & ${}^{\circ}$ \\
+				      	$\Delta y$					&		 1/8				&			\text{Vertical distance between adjacent nodes} & ${}^{\circ}$ \\
+				      	$\Delta t$ 				&		450	&		\text{Time-step} 	&	$s$ \\
+				      	$\tau_{0}$					&		0.2	&  \text{Wind forcing strength}	& $ms^{-2}$\\
+				      	$C_{\text{relax}}$    & $1.1574\times 10^{-6}$	& Relaxation time-scale	 & $s^{-1}$\\
+				      	$\Delta$ 	& 0	& Northward shift in wind forcing & ${}^\circ$\\
+				      	$T_{0}$ & 14.03 &	 Parameter for initial temperature profile & ${}^{\circ}C$\\
+				      	$\beta$ &  10.99 & Parameter for initial temperature profile & ${}^{\circ}C$\\
+				      	$\lambda$ & 100 & Parameter for initial temperature profile& $m$ \\
+				      	$z_{0}$		& 	-350 &	Parameter for initial temperature profile & $m$\\
+				      	$h$ & 2500 & Parameter for initial temperature profile& $m$\\
+    
+             \hline
+		\end{tabular}
+		\caption{Model Parameters}
+		           	\label{table:parameters}
+\end{table}
+These are the reference parameters, which are the parameters used in what follows unless stated otherwise. 
+
+\subsection{Preliminary results}
+
+We wish to study the effects of small-scale eddies on the behaviour of a large-scale jet structure such as the Gulf Stream. In order to do this, we need to reproduce such a jet in our North-Atlantic box model. \\
+\linebreak
+So let us run the model with the parameters as given in \cref{table:parameters}. We plot in \cref{fig:ssh5,fig:ssh10,fig:strat1,fig:strat10} the sea surface height after 5 and 10 years of model time, and the vertical profile of average temperature. 
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{../FESOM/MESHES/high_res/results_norelax/plots/ssh_allyears_12_1952_high_res_norelax.png}
+    \captionsetup{width=.8\linewidth}
+  	\caption{\footnotesize Sea-surface height after 5 years}
+  \label{fig:ssh5}
+\end{subfigure}%
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{../FESOM/MESHES/high_res/results_norelax/plots/ssh_allyears_12_1957_high_res_norelax.png}
+    \captionsetup{width=.8\linewidth}
+  \caption{ \footnotesize Sea-surface height after 10 years}
+  \label{fig:ssh10}
+\end{subfigure}
+
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{../FESOM/MESHES/high_res/results_norelax/plots/temp_strat_1_1948_high_res_norelax.png}
+    \captionsetup{width=.8\linewidth}
+  \caption{\footnotesize Average temperature profile after 1 month}
+  \label{fig:strat1}
+\end{subfigure}%
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{../FESOM/MESHES/high_res/results_norelax/plots/temp_strat_12_1957_high_res_norelax.png}
+    \captionsetup{width=.8\linewidth}
+  \caption{ \footnotesize Average temperature profile after 10 years}
+  \label{fig:strat10}
+\end{subfigure}
+\end{figure}
+Here we see that there is a clear separation in the sea-surface height between the north and the south; however there is also a lot of turbulence and no clear jet being formed. Moreover, We can see from \cref{fig:strat1,fig:strat10} that the wind forcing causes vertical mixing and therefore the smoothing out of the thermocline. However, for our studies we require a solution in statistical equilibrium with a stable thermocline, in order to adequately represent the physical ocean. \\
+\indnt In order to achieve this we propose to introduce a temperature relaxation at the top and bottom boundaries. This is in fact physically justified because the temperature in the northern ocean is cooler than that at lower latitudes, and so the forcing is intended to simulate this effect. The forcing we use is as follows:
+\eqnn{
+F =\begin{cases}
+	 C_{\text{relax}} \lrb{1 - \frac{60^{\circ} - y}{1.5^{\circ}}} (T_{clim} - T)  \qquad &\text{if} \quad y>58.5^{\circ} \\
+	C_{\text{relax}}\lrb{1 + \frac{30^{\circ} - y}{1.5^{\circ}}}(T_{clim} - T) \quad & \text{if} \quad y < 31.5^{\circ}
+\end{cases}
+}
+That is, we relax towards a specified `climatology' temperature profile, which we choose to have the form:
+\eqnn{
+	T_{clim} = \begin{cases}
+						4.5213 + 1.4813 \tanh\lrb{\frac{z +350}{100}} + \frac{z}{2500} \qquad &\text{if} \quad y>58.5^{\circ} \\
+						19.535 +16.495 \tanh\lrb{\frac{z + 350}{100}} + \frac{z}{2500}  \quad & \text{if} \quad y < 31.5^{\circ}
+		\end{cases}
+}
+We use these profiles based on considerations of the Rossby Radius of Deformation, $R_{d}$. In the Atlantic Ocean $R_{d}$ should be on average $30km$ \cite{hallberg_2013}, being larger towards the south and smaller in the North. The parameters we have used give a northern profile with $R_{d} = 24.8km$ and a southern profile with $R_{d} = 36.13km$. The result of imposing this forcing is as follows:
+
+\IfFileExists{../FESOM/MESHES/high_res/results_relllax/plots/ssh_allyears_12_1952_high_res_relllax.png}{
+\IfFileExists{../FESOM/MESHES/high_res/results_relllax/plots/ssh_allyears_12_1957_high_res_relllax.png}{
+\IfFileExists{../FESOM/MESHES/high_res/results_relllax/plots/temp_strat_1_1948_high_res_relllax.png}{
+\IfFileExists{../FESOM/MESHES/high_res/results_relllax/plots/temp_strat_12_1957_high_res_relllax.png}{
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{../FESOM/MESHES/high_res/results_relllax/plots/ssh_allyears_12_1952_high_res_relllax.png}
+    \captionsetup{width=.8\linewidth}
+  	\caption{\footnotesize Sea-surface height after 5 years}
+  \label{fig:ssh5i}
+\end{subfigure}%
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{../FESOM/MESHES/high_res/results_relllax/plots/ssh_allyears_12_1957_high_res_relllax.png}
+    \captionsetup{width=.8\linewidth}
+  \caption{ \footnotesize Sea-surface height after 10 years}
+  \label{fig:ssh10i}
+\end{subfigure}
+
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{../FESOM/MESHES/high_res/results_relllax/plots/temp_strat_1_1948_high_res_relllax.png}
+    \captionsetup{width=.8\linewidth}
+  \caption{\footnotesize Average temperature profile after 1 month}
+  \label{fig:strat1i}
+\end{subfigure}%
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{../FESOM/MESHES/high_res/results_relllax/plots/temp_strat_12_1957_high_res_relllax.png}
+    \captionsetup{width=.8\linewidth}
+  \caption{ \footnotesize Average temperature profile after 10 years}
+  \label{fig:strat10i}
+\end{subfigure}
+\end{figure}
+}}}}
+\text{ }\\
+
+We see an improvement here, in that the vertical temperature profile seems to stabilise; however the sea-surface height field is still quite turbulent; there does however seem to be a jet beginning to form on the western boundary, although it separates from the boundary at a latitude just below $45^{\circ}$N. In order to move the separation point northwards we can shift the wind forcing northwards by setting parameter $\Delta=3^{\circ}$ (see \cref{eq:windforcing}). We continue from the end of the previous simulation and run for another ten years with the modified wind forcing.
+
+
+\IfFileExists{../FESOM/MESHES/high_res/results_relllax/plots/ssh_allyears_12_1967_high_res_relllax.png}{
+\IfFileExists{../FESOM/MESHES/high_res/results_relllax/plots/temp_strat_12_1967_high_res_relllax.png}{
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{../FESOM/MESHES/high_res/results_relllax/plots/ssh_allyears_12_1967_high_res_relllax.png}
+    \captionsetup{width=.8\linewidth}
+  	\caption{\footnotesize Sea-surface height after 5 years}
+  \label{fig:ssh5ii}
+\end{subfigure}%
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{../FESOM/MESHES/high_res/results_relllax/plots/temp_strat_12_1967_high_res_relllax.png}
+    \captionsetup{width=.8\linewidth}
+  \caption{ \footnotesize Sea-surface height after 10 years}
+  \label{fig:ssh10ii}
+\end{subfigure}
+\end{figure}
+}}
+\text{   }The separation point is thus moved northwards to a more physically-realistic location; moreover the temperature profile stays approximately constant. We can also plot time-series of kinetic energy and average Rossby Deformation radius in order to confirm that the solution reaches a statistical equilibrium:
+
+\IfFileExists{../FESOM/MESHES/high_res/results_relllax/plots/ke_timeseries.png}{
+\IfFileExists{../FESOM/MESHES/high_res/results_relllax/plots/RDR_timeseries.png}{
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{../FESOM/MESHES/high_res/results_relllax/plots/ke_timeseries.png}
+    \captionsetup{width=.8\linewidth}
+  	\caption{\footnotesize Time series of average kinetic energy over 40 years}
+  \label{fig:kets}
+\end{subfigure}%
+\begin{subfigure}{0.45\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{../FESOM/MESHES/high_res/results_relllax/plots/RDR_timeseries.png}
+    \captionsetup{width=.8\linewidth}
+  \caption{ \footnotesize Time series of average first Rossby deformation radius over 40 years. Data points are taken at the beginning of each simulation year.}
+  \label{fig:rdts}
+\end{subfigure}
+\end{figure}
+}}
+\text{       }
+From \cref{fig:kets,fig:rdts} it seems that the kinetic energy and Rossby deformation radius stabilise after an initial spin-up time. The deformation radius has a jump for the initial spin-up, then another jump when the wind forcing is shifted northwards; however, after about 1965 there are only small oscillations, indicating that the flow has reached an equilibrium.
+
+\subsection{Computational Costs}
+
+Here we summarise the approximate computational costs in terms of walltime, as a function of grid resolution and number of processors:
+
+\begin{table}[H]        
+	\centering
+		\begin{tabular}{|c|c|c|}
+			\hline
+				    $\Delta x$	 & Number of Processors	& Approximate runtime required for 10 years of simulation time\\
+			\hline
+					$1^{\circ}$	& 36	& 8.5mins	\\
+					$1^{\circ}$	& 72	& 7mins	\\
+					$1/2^{\circ}$ & 144 & 7mins \\
+					$1/4^{\circ}$	&	36 & 1hr 59mins	\\
+					$1/8^{\circ}$	& 72	&  8hrs 52mins\\
+					$1/8^{\circ}$	& 144	&  4hrs 10mins\\
+					$1/8^{\circ}$	& 288	&  1hr 50mins\\
+					$1/8^{\circ}$	& 576	&  1hr 21mins\\
+					$1/8^{\circ}$	& 1152	&  59mins\\
+					$1/8^{\circ}$ & 2304 & 59mins\\
+					$1/16^{\circ}$ & 1152 &	5hrs 12mins\\
+             \hline
+		\end{tabular}
+		\caption{Computational costs for FESOM2.0}
+		           	\label{table:costs}
+\end{table}
+In general it seems that doubling the number of processors approximately halves the computation time; we see an exception at $1/8^{\circ}$, when doubling from 1152 to 2304 has practically no effect on the computation time. Similarly, doubling from 36 to 72 processors in the $1^{\circ}$ simulation only reduces the runtime by 1 minute. It seems therefore that at each resolution there is an upper limit on how much increasing the number of processors can speed up computation time. Further investigation would be needed to precisely determine the optimal number of processors for each resolution. 
+
+\subsection{Next Steps}
+
+Now we have a model set-up, which we may use as a reference for investigating  eddy parameterisations schemes. Our immediate next steps will be to run equivalent simulations at varying resolutions, and to perform statistical analysis on the resulting solutions; this will then inform the implementation of our parameterisations. 

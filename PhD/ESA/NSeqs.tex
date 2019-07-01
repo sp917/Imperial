@@ -1,0 +1,28 @@
+Here we derive the Navier-Stokes equations for a fluid under the influence of gravity and Coriolis force.\\
+\linebreak
+We consider the fluid contained within an arbitrary volume $V$. By Newton's Second Law the total momentum obeys:
+\eqnn{
+	\D{}{t} \int_{V} \rho \vec{u} d^{3}x = -\int_{\pr V} \rho \vec{u} \vec{u}\cdot d\vec{S} - \int_{V}\lrsq{\rho \vec{f}\times \vec{u} + \rho g}\vec{e}_{3}dx + \int_{\pr V} \tau d\vec{S} 
+}
+Here $\tau_{ij} = -p\delta_{ij} + \sigma_{ij}$ is the stress tensor, and $\sigma_{ij}$ is to be determined later.\\
+We now apply the divergence theorem to write this in the form:
+\eqnn{
+	\int_{V}\lrb{\PD{}{t}\lrb{\rho\vec{u}}+\nabla\cdot\lrb{\rho\vec{u}\vec{u}} + \rho \vec{f}\times \vec{u} + \rho g \vec{e}_{3}-  \nabla\cdot\tau }d^{3}x = 0 
+}
+Since the volume of integration $V$ is arbitrary, we have the following resulting equation:
+\eqnn{
+	\PD{}{t}\lrb{\rho\vec{u}}+\nabla\cdot\lrb{\rho\vec{u}\vec{u}} + \rho \vec{f}\times \vec{u} + \rho g\vec{e}_{3} =  \nabla\cdot\tau   
+}
+The conservation of mass law may be expressed as:
+\eqnn{
+	\D{}{t}\int_{V}\rho d^{3}x = - \int_{V}\rho \vec{u}\cdot d\vec{S}
+}
+Again, using the divergence theorem and the fact that the integration volume $V$ is arbitrary, we arive at the continuity equation:
+\eqnn{
+	\PD{\rho}{t} + \nabla\cdot\lrb{\rho \vec{u}} =0
+}
+Combining this with the momentum equation, we arrive at:
+\eqnn{
+	\PD{\vec{u}}{t} + \vec{u}\cdot\nabla\vec{u} + \vec{f}\times\vec{u} + g\vec{e}_{3} = -\frac{1}{\rho}\nabla p + \frac{1}{\rho}\nabla\cdot\sigma
+}
+

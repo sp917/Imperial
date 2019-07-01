@@ -1,0 +1,112 @@
+\newcommand{\etalchar}[1]{$^{#1}$}
+\begin{thebibliography}{DHPRF04}
+
+\bibitem[Adc04]{adcroft_2004}
+A.~Adcroft.
+\newblock Lecture 18: Ocean general circulation modelling.
+\newblock Available at:
+  \url{https://ocw.mit.edu/courses/earth-atmospheric-and-planetary-sciences/12-950-atmospheric-and-oceanic-modeling-spring-2004/lecture-notes/lec20.pdf},
+  2004.
+
+\bibitem[Ber15]{berloff_2015}
+P.~Berloff.
+\newblock Dynamically consistent parameterization of mesoscale eddies. part i:
+  Simple model.
+\newblock {\em Ocean Modelling}, 87:1--19, 2015.
+
+\bibitem[Ber16]{berloff_2016}
+P.~Berloff.
+\newblock Dynamically consistent parameterization of mesoscale eddies--part ii:
+  Eddy fluxes and diffusivity from transient impulses.
+\newblock {\em Fluids}, 1(3):22, 2016.
+
+\bibitem[Ber18]{berloff_2018}
+P.~Berloff.
+\newblock Dynamically consistent parameterization of mesoscale eddies. part
+  iii: Deterministic approach.
+\newblock {\em Ocean Modelling}, 127:1--15, 2018.
+
+\bibitem[CCH{\etalchar{+}}18]{cotter_crisan_holm_pan_shevchenko_2018}
+C.~Cotter, D.~Crisan, D.~D. Holm, W.~Pan, and I.~Shevchenko.
+\newblock Modelling uncertainty using circulation-preserving stochastic
+  transport noise in a 2-layer quasi-geostrophic model.
+\newblock {\em arXiv preprint arXiv:1802.05711}, 2018.
+
+\bibitem[DHPRF04]{donea_huerta_ponthot_rodriguez-ferran_2004}
+J.~Donea, A.~Huerta, J.-Ph. Ponthot, and A.~Rodriguez-Ferran.
+\newblock Arbitrary lagrangian-eulerian methods.
+\newblock {\em Encyclopedia of Computational Mechanics}, 2004.
+
+\bibitem[DJKO19]{danilov_juricke_kutsenko_oliver_2019}
+S.~Danilov, S.~Juricke, A.~Kutsenko, and M.~Oliver.
+\newblock Toward consistent subgrid momentum closures in ocean models.
+\newblock {\em Mathematics of Planet Earth Energy Transfers in Atmosphere and
+  Ocean}, pages 145--192, 2019.
+
+\bibitem[DSWJ16]{danilov_sidorenko_wang_jung_2016}
+S.~Danilov, D.~Sidorenko, Q.~Wang, and T.~Jung.
+\newblock The finite-volume sea ice-ocean model (fesom2).
+\newblock {\em Geoscientific Model Development Discussions}, pages 1--44, 2016.
+
+\bibitem[FKM08]{fox-kemper_menemenlis_2008}
+B.~Fox-Kemper and D.~Menemenlis.
+\newblock Can large eddy simulation techniques improve mesoscale rich ocean
+  models?
+\newblock {\em Ocean Modeling in an Eddying Regime Geophysical Monograph
+  Series}, pages 319--337, 2008.
+
+\bibitem[GM90]{gent_mcwilliams_1990}
+P.~R. Gent and J.~C. Mcwilliams.
+\newblock Isopycnal mixing in ocean circulation models.
+\newblock {\em Journal of Physical Oceanography}, 20(1):150--155, 1990.
+
+\bibitem[Hal13]{hallberg_2013}
+Robert Hallberg.
+\newblock Using a resolution function to regulate parameterizations of oceanic
+  mesoscale eddy effects.
+\newblock {\em Ocean Modelling}, 72:92--103, 2013.
+
+\bibitem[HSS11]{holm_schmah_stoica_2011}
+D.~D. Holm, T.~Schmah, and C.~Stoica.
+\newblock {\em Geometric mechanics and symmetry: from finite to infinite
+  dimensions}.
+\newblock Oxford Univ. Press, 2011.
+
+\bibitem[JDKO19]{juricke_danilov_kutsenko_oliver_2019}
+S.~Juricke, S.~Danilov, A.~Kutsenko, and M.~Oliver.
+\newblock Ocean kinetic energy backscatter parametrizations on unstructured
+  grids: Impact on mesoscale turbulence in a channel.
+\newblock {\em Ocean Modelling}, 138:51--67, 2019.
+
+\bibitem[JH14]{jansen_held_2014}
+M.~F. Jansen and I.~M. Held.
+\newblock Parameterizing subgrid-scale eddy effects using energetically
+  consistent backscatter.
+\newblock {\em Ocean Modelling}, 80:36--48, 2014.
+
+\bibitem[JM95]{jackett_mcdougall_1995}
+D.~R. Jackett and T.~J. Mcdougall.
+\newblock Minimal adjustment of hydrographic profiles to achieve static
+  stability.
+\newblock {\em Journal of Atmospheric and Oceanic Technology}, 12(2):381--389,
+  1995.
+
+\bibitem[KCB18]{kondrashov_chekroun_berloff_2018}
+D.~Kondrashov, M.~Chekroun, and P.~Berloff.
+\newblock Multiscale stuart-landau emulators: Application to wind-driven ocean
+  gyres.
+\newblock {\em Fluids}, 3(1):21, 2018.
+
+\bibitem[oE18]{mit_2018}
+MIT~Department of~EAPS.
+\newblock Mitgcm user manual.
+\newblock Available at:
+  \url{http://mitgcm.org/public/r2_manual/final/online_documents/manual.pdf},
+  2018.
+
+\bibitem[Ros96]{rossby_1996}
+T.~Rossby.
+\newblock The north atlantic current and surrounding waters: At the crossroads.
+\newblock {\em Reviews of Geophysics}, 34(4):463--481, 1996.
+
+\end{thebibliography}

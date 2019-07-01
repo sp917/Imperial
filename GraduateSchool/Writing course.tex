@@ -1,0 +1,39 @@
+\documentclass[11pt]{article}
+
+\input{Preamble}
+\usepackage{url}
+\usepackage{amsfonts}
+
+\begin{document}
+
+\title{\vspace{-4.0em}Eddy Parameterisations in Oceanic Primitive Equation Models}
+\date{\vspace{-0.5em}}
+\author{Student: Stuart Patching (Imperial College)\\
+\small{Primary Supervisor: Professor Darryl Holm (Imperial College)}\\
+\small{Co-Supervisors: Dr. Pavel Berloff (Imperial College), Dr. Igor Shevchenko (Imperial College)} \vspace{-2em}}
+\maketitle
+\textbf{ }\\
+		The Gulf Stream has a significant impact on the climate of Europe, keeping temperatures relatively mild by transporting warm water across the Atlantic. Therefore understanding the Gulf Stream is highly important for understanding how the climate may be affected by changes in the ocean and atmosphere as a result of anthropogenic activity. However, western boundary currents like the Gulf Stream are poorly understood, since they contain dynamics across many scales, with meso-scale eddies playing an important role in maintaining their eastward jet extensions. In order to capture the eddy effects in simulations, therefore, it appears to be necessary to use a very fine grid capable of resolving motion on small scales. However, such high-resolution simulations are not viable on time-scales relevant for climate studies. \\
+		\indnt The alternative to using high-resolution simulations is to modify the ocean model used in such a way that the eddy backscatter effect is represented in a model on a coarser grid, without resolving the eddies explicitly. Such a modification to the model is called a parameterisation. \\
+		\linebreak
+		There have been several proposed apporaches to this problem; in this project we shall consider three possible methods. The first of these consists of a flow-roughneing approach as described in \cite{i}. The idea of this method is to use an eddy-permitting grid, i.e. one with a scale that captures some of the eddy effects but does not resolve them fully, and to introduce a roughening parameter which amplifies the backscatter. \\
+		\indnt The second method we shall consider consists introducing stochastic advection into the model (see \cite{ii}) in order to represent small-scale eddy effects by noise. The key advantage of this method is that the noise is introduced in such a way as to preserve important features of the governing fluid equations, such as the Kelvin circulation theorem. The stochasticity may also account for the uncertainties intrinsic to in any ocean model. \\
+		\indnt The final method involves data-driven emulators, in which the parameterisation is derived from data obtained from high-resolution simulations or from observations, see \cite{vii}. \\
+		\linebreak
+		These methods have been tested in the case of simple quasigeostrophic ocean models; however, the aim of this project is to implement such parameterisations in more realistic primitive equation or Boussinesq models. \\
+		 \indnt In particular, we shall use two global circulation models. The first of these is FESOM2.0 (see \cite{v}), developed by a group at the Alfred Wegener Institute. This model is based on the primitive equations and uses a finite-volume method in combination with Arbitrary Lagrangian-Eulerian (ALE) coordinates. The second model is MITgcm (see \cite{vi}), which also employs a finite-element method, but solves the Boussinesq equations.\\
+		 \indnt In both cases I shall implement the paramaterisations not on the global ocean, but on an idealised circular double-gyre configuration. This will allow us to focus on the particular problem of the parameterisation of eddy backscatter without having to take into account the complex boundary conditions that would be present in a realistic model of the earth's ocean.
+
+\begin{thebibliography}{9}
+	\bibitem{i}  P. Berloff. Dynamically consistent Parameterization of Mesoscale Eddies. Part III: Deterministic Approach. \textit{Ocean Modelling}. 2018. \textbf{127}, 1-15.
+	\bibitem{ii} C. Cotter, D. Crisan, D. D. Holm, W. Pan, I. Shevchenko. Modelling uncertainty using circulation-preserving stochastic transport noise in a 2-layer quasi-geostrophic model. 2018. Available from arXiv:1802.05711v1 [physics.flu-dyn].
+	\bibitem{iii} I. Shevchenko, P. Berloff. Multi-Layer quasi-geostrophic ocean dynamics in Eddy-resolving regimes. \textit{Ocean Modelling}. 2015. \textbf{94}, 1-14.
+	\bibitem{iv} P. Sagaut. \textit{Large Eddy Simulation for Incompressible Flows}. Third Edition. Springer. 2006. 
+	\bibitem{v} S. Danilov, D Sidorenko, Q. Wang, T. Jung. The Finite-volumE Sea ice-Ocean Model (FESOM2). \textit{Geosci. Model. DEv}. 2017. \textbf{10}, 765-789.
+	\bibitem{vi} A. Adcroft et al. \i{MITGCM User Manual}. Available at: \url{http://mitgcm.org/public/r2_manual/final/online_documents/manual.pdf} [Accessed 29/12/2018]
+	\bibitem{vii} D. Kondrashov, M. D. Chekroun, P. Berloff. Multiscale Stuart-Landau Emulators: Application to Wind-Driven Ocean Gyres. \textit{Fluids} \b{3} (1), 21. \url{https://doi.org/10.3390/fluids3010021}
+\end{thebibliography}
+
+
+	
+\end{document}

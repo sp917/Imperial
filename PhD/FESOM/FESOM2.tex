@@ -1,0 +1,119 @@
+ \documentclass[10pt]{article}
+
+\input{../Preamble}
+
+\begin{document}
+\title{FESOM2}
+\date{}
+\maketitle
+
+\section{Physical Model}
+\subsection{Arbitrary Lagrangian-Eulerian Coordinates}
+\subsection{Derivation of momentum equation}
+
+Let $V_{t}$ be a volume moving with velocity $\vec{v}(x,t)$. Then let us consider the conservation of momentum equation:
+
+\eq{
+	\D{}{t} \int_{V_{t}} \rho(x,t)\vec{u}(x,t) d^{3}x = -\int_{\partial V_{t}} \rho(x,t)\vec{u}(x,t) \lrsq{\vec{u}(x,t) - \vec{v}(x,t)} \cdot n(x,t) dS(x) + \int_{V_{t}} \vec{F}(x,t) d^{3}x
+}
+
+$\vec{F}(x,t)$ stands for any force acting on the fluid.\\
+\linebreak
+Now let us specialise to the particular case in which $V_{t}$ is a triangular prism with variable height, but constant triangular end faces of area $A$, which may or may not be flat.\\
+\linebreak
+Therefore the integral splits up as follows:
+\algnn{
+	&\D{}{t} \int_{A} \int_{z_{-}(\b{x},t)}^{z_{+}(\b{x},t)} \rho(\b{x},z,t)\vec{u}(\b{x},z,t) dz dS(\b{x}) = \\
+	& \qquad -\int_{\partial A}dl(\b{x}) \int_{z_{-}(\b{x},t)}^{z_{+}(\b{x},t)} \rho(\b{x},z,t)\vec{u}(\b{x},z,t) \b{u}(\b{x},z,t) \cdot \b{n}(\b{x},t) dz dS(\b{x}) \\
+	& \qquad - \int_{A} \lrc{ \rho(\b{x},z_{+},t)\vec{u}(\b{x},z_{+},t) \vec{w}(\b{x},z_{+},t)\cdot \vec{n}_{+} +  \rho(\b{x},z_{+},t)u(\b{x},z_{+},t)  \vec{w}(\b{x},z_{+},t)\cdot\vec{n}_{-}}  dS(\b{x})\\
+	&\qquad + \int_{A}\int_{z_{-}}^{z^{+}} \vec{F}(x,t) dz dS(\b{x})
+}
+where we denote $\vec{w}: = \vec{u} - \vec{v} = (\hat{\b{u}},\hat{w})$. In what follows let us denote $\tl{w}_{\pm} : = \pm\vec{w}\cdot n_{\pm}$. If the top and bottom faces of the prism are flat then $n_{\pm} = \pm e_{3}$ and $\tl{w}_{\pm} = \pm\left.\hat{w}\right|_{z_{\pm}}$.\\
+\linebreak
+Now, denoting with an overbar the height average $\frac{1}{h}\int_{z_{-}}^{z_{+}}dz$, with $h = z_{+} - z_{-}$, we find:
+\algnn{
+	&\D{}{t} \int_{A} h(\b{x},t)\ol{\rho\vec{u}}(\b{x},t)  dS(\b{x}) = \\
+	& \qquad -\int_{\partial A}dl(\b{x}) h(\b{x},t)\ol{\rho\vec{u} \b{u}}(\b{x},t) \cdot \b{n}(\b{x},t) dS(\b{x}) \\
+	& \qquad - \int_{A} \lrc{ \rho(\b{x},z_{+},t)\vec{u}(\b{x},z_{+},t) \tl{w}_{+} -  \rho(\b{x},z_{+},t)u(\b{x},z_{+},t)  \tl{w}_{-}}  dS(\b{x})\\
+	&\qquad + \int_{A} h(\b{x},t)\ol{F}(\b{x},t) dS(\b{x})
+}
+We may now apply the two-dimensional divergence theorem to obtain:
+\eqlab{
+	\int_{A}\lrc{ \PD{}{t} (h\ol{\rho\vec{u}}) + \nabla\cdot\lrb{h\ol{\rho\vec{u} \b{u}}}  + (\rho \vec{u} \tl{w})_{z_{+}} -(\rho \vec{u} \tl{w})_{z_{-}}  - h\ol{F}}dS(\b{x}) = 0
+}{inteq}
+\b{Assumption 1}: $\rho$ deviates only a small amount from its reference value $\rho_{0}$. That is, $\rho = \rho_{0} + \rho'$ and $\rho' \ll \rho_{0}$.\\
+\b{Assumption 2}: Quantities do not vary in space over the volume $V_{t}$.\\
+From these assumptions, \cref{eq:inteq} gives the approximation:
+\eqnn{
+ \PD{}{t} (h\vec{u}) + \nabla\cdot\lrb{h\vec{u} \b{u}}  + ( \vec{u} \tl{w})_{z_{+}} -( \vec{u} \tl{w})_{z_{-}}  = \frac{1}{\rho_{0}}hF  
+}
+Looking only at the horizontal components, we have:
+\eqnn{
+ \PD{}{t} (h\B{u}) + \nabla\cdot\lrb{h\B{u} \B{u}}  + ( \B{u} \tl{w})_{z_{+}} -( \B{u} \tl{w})_{z_{-}}  = \frac{1}{\rho_{0}}h\B{F}  
+}
+We choose $\B{F}$ to be the following:
+\eqnn{
+	\b{F} : = -\rho f\B{k}\times\B{u} - \nabla p - g\rho\nabla Z + \rho D(\b{u})
+}
+where $D(\B{u})$ is some viscosity term. Therefore, on each layer $V_{k}$ we have:
+\eqlab{
+	 \PD{}{t} (h_{k}\B{u}_{k}) + \nabla\cdot\lrb{h_{k}\B{u}_{k} \B{u}_{k}}  + ( \B{u}_{k} \tl{w}_{k})_{z_{+}} -( \B{u}_{k} \tl{w}_{k})_{z_{-}}  = -fh_{k}\B{k}\times\B{u}_{k} - \frac{h_{k}}{\rho_{0}}\nabla p_{k} - \frac{gh_{k}\rho_{k}}{\rho_{0}} \nabla Z_{k} + h_{k} D(\b{u}_{k})
+}{momentum}
+We can similarly derive the continuity equation for each layer:
+\eqlab{
+	\PD{}{t}h_{k} + \nabla\cdot(\B{u}h)_{k} + \lrb{\tl{w}_{k}}_{z_{+}} - \lrb{\tl{w}_{k}}_{z_{-}} + W\delta_{k1} = 0 
+}{continuity}
+where $W$ is the flux through the upper layer, so we set $\tl{w} = 0$ at the top layer. \\
+\linebreak
+Now, note that if we integrate the above equation over all layers, we find:
+\eqnn{
+	\PD{}{t}\eta + \nabla\cdot \sum_{k} h_{k}\b{u}_{k} + W = 0
+}
+Note that we can combine \cref{eq:momentum,eq:continuity} to give an evolution equation just in terms of $\b{u}$:
+\algnn{
+	\PD{\B{u}}{t} + \B{u}\cdot\nabla\B{u} + f\B{k}\times \B{u} + \frac{1}{\rho_{0}}\nabla{p} + \frac{g\rho}{\rho_{0}}\nabla Z - \frac{1}{h}\B{u}\lrb{w^{t} - w^{b}}  + w^{t}\B{u}^{t} - w^{b}\B{u}^{b} =D_{u}\B{u} + \nu_{v}\lrb{\pr_{z}\B{u}^{t} - \pr_{z}\B{u}^{b}} 
+} 
+We can then write $\B{u} = \lrb{\B{u}^{t} + \B{u}^{b}}/2$ and $\pr_{z}\B{u} = (\B{u}^{t} - \B{u}^{b})/h$ to arrive at:
+\algnn{
+	\PD{\B{u}}{t} + \B{u}\cdot\nabla\B{u} + f\B{k}\times \B{u} + \frac{1}{\rho_{0}}\nabla{p} + \frac{g\rho}{\rho_{0}}\nabla Z + \Half\lrb{(w\pr_{z}\B{u})^{t} + (w\pr_{z}\B{u})^{b}} =D_{u}\B{u} + \nu_{v}\lrb{\pr_{z}\B{u}^{t} - \pr_{z}\B{u}^{b}} 
+} 
+Now let us examine out time-stepping algorithm. We evaluate $h$ only at half-time steps, and $\eta,\B{u}$ on full time-steps. Thus the evolution equation for $h$ is given by:
+\eqlab{
+	h^{n+1/2}_{k} = h^{n-1/2}_{k} - \tau\lrc{\nabla\cdot (\B{u}^{n}_{k}h_{k}^{n-1/2}) + \lrb{\tl{w}^{n}_{k}}_{+} - \lrb{\tl{w}^{n}_{k}}_{-} + W^{n-1/2}\delta_{k1}}
+}{hevol}
+where $\tau$ is the time-stepping interval. Now define:
+\eqnn{
+	\bar{h} = \sum_{k}h_{k} - H
+}
+where $H$ is the equilibrium sea surface height. Then:
+\eqlab{
+	\bar{h}^{n+1/2} = \bar{h}^{n-1/2} - \tau \nabla\cdot \int^{\bar{h}^{n-1/2}}\B{u}^{n}dz - \tau W^{n-1/2}
+}{hbarevol}
+Moreover:
+\eqlab{
+	\eta^{n+1} = \eta^{n} -\al\tau\lrb{\nabla\cdot \int^{\bar{h}^{n+1/2}}\B{u}^{n+1}dz + W^{n+1/2}} - (1-\al)\tau\lrb{\nabla\cdot \int^{\bar{h}^{n-1/2}}\B{u}^{n}dz + W^{n-1/2}}
+}{etaevol}
+We need these two preceding equations to be consistent. \\
+\linebreak
+$\B{u}$ evolves according to:
+\algn{
+	\B{u}^{*} & = \B{u}^{n} + \tau \PD{}{z}\lrb{\nu_{v}\PD{}{z}(\B{u}^{*} - \B{u}^{n})} + \tau\lrb{\B{R}_{u}^{n+1/2} + \PD{}{z}\lrb{\nu_{v}\PD{}{z}\B{u}^{n}} - g\nabla\eta} \label{eq:deltau}\\
+	\B{u}^{n+1} & = \B{u}^{*} - g\tau \theta\nabla\lrb{\eta^{n+1} - \eta^{n}}  \label{eq:uevol}
+}
+So the strategy is as follows:
+\begin{itemize}
+	\item Calculate $\eta^{n} = \al\bar{h}^{n+1/2} + (1-\al)\bar{h}^{n-1/2}$.
+	\item Calculate $\B{u}^{*}$ from \cref{eq:deltau}.
+	\item Calculate $\bar{h}^{n+3/2}$ from \cref{eq:hbarevol}.  
+	\item Calculate $\eta^{n+1}$ from \cref{eq:etaevol}.
+	\item Calculate $\B{u}^{n+1}$ from \cref{eq:uevol}.
+\end{itemize}
+In order to calculate $\B{u}^{*}$ from \cref{eq:deltau} it is necessary to calculate the surface fluxes $\tl{w}_{\pm}$. We can do this via \cref{eq:hevol}, if we assume that the heights change according to:
+\eqnn{
+	\pr_{t}h_{k} = p_{k}\pr_{t}\bar{h} 
+}
+where $\sum_{k}p_{k} = 1$. Therefore we have:
+\eqnn{
+	\lrb{\tl{w}^{n}_{k}}_{+} - \lrb{\tl{w}^{n}_{k}}_{-}  = -\frac{p_{k}}{\tau}\lrb{h^{n+1/2}- h^{n-1/2}}- \nabla\cdot (\B{u}^{n}_{k}h_{k}^{n-1/2})- W^{n-1/2}\delta_{k1}
+}
+\end{document}

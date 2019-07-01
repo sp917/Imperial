@@ -1,0 +1,14 @@
+*.pdf
+*.out
+*.log
+*.jpg
+*.png
+*.mp4
+*.aux
+*.gz
+*~
+PhD/FESOM/MESHES/*
+MRes/*
+PhD/Jamboree/*
+PhD/MOM/DATA
+

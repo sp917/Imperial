@@ -1,0 +1,600 @@
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage[mathscr]{euscript}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{tensor}
+\usepackage{fullpage}
+\usepackage{enumerate}
+\usepackage{graphicx,caption}
+\usepackage{float}
+\usepackage{url}
+\usepackage[hidelinks]{hyperref}
+\usepackage{cleveref}
+\usepackage[font=footnotesize,labelfont=footnotesize]{caption}
+\usepackage[ansinew]{inputenc}
+\usepackage{pbox}
+\usepackage{cancel}
+\usepackage{accents}
+\usepackage{subcaption}
+\usepackage{color}
+
+
+\setlength\parindent{0pt}
+\linespread{1.2}
+
+\newcommand{\D}[2]{\frac{d #1}{d #2}}
+\newcommand{\PD}[2]{\frac{\partial #1}{\partial #2}}
+\newcommand{\eq}[1]{\begin{equation} #1 \end{equation}}
+\newcommand{\eqlab}[2]{\begin{equation} #1 \label{eq:#2} \end{equation}}
+\newcommand{\eqnn}[1]{\eq{#1 \nonumber}}
+\newcommand{\algn}[1]{\begin{align} #1 \end{align}}
+\newcommand{\algnn}[1]{\begin{align*} #1 \end{align*}}
+\newcommand{\bra}[1]{\left\langle #1 \right|}
+\newcommand{\ket}[1]{\left| #1 \right\rangle}
+\newcommand{\braket}[2]{\langle #1 | #2 \rangle}
+\newcommand{\Braket}[3]{\langle #1 | #2 | #3 \rangle}
+\newcommand{\B}[1]{\mathbf{#1}}
+\newcommand{\tvec}[2]{\left(\begin{array}{c} #1 \\ #2 \end{array}\right)}
+\newcommand{\tvecs}[2]{\left(\begin{smallmatrix} #1\\#2\end{smallmatrix}\right)}
+\newcommand{\twobytwomatrix}[4]{\left(\begin{array}{cc} #1 & #2 \\ #3 & #4\end{array}\right)}
+\newcommand{\threevec}[3]{\left(\begin{array}{c} #1 \\ #2 \\ #3 \end{array}\right)}
+\newcommand{\ph}{\varphi}
+\newcommand{\TL}[1]{\tensor{\Lambda}{#1}}
+\newcommand{\TG}[1]{\tensor{\Gamma}{#1}}
+\newcommand{\TT}[1]{\tensor{T}{#1}}
+\newcommand{\TA}[1]{\tensor{A}{#1}}
+\newcommand{\Td}[1]{\tensor{\delta}{#1}}
+\newcommand{\TAinv}[1]{\tensor{{(A^{-1})}}{#1}}
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\Dc}{\mathcal{D}}
+\renewcommand{\L}{\mathcal{L}}
+\newcommand{\intp}[1]{\int{\frac{d^{3}\B{#1}}{(2\pi)^{3}}\:}}
+\newcommand{\intE}[1]{\int{\frac{d^{3}\B{#1}}{(2\pi)^{3}}\frac{1}{2E_{#1}}\:}}
+\newcommand{\intpi}[1]{\int{\frac{d^{3}\B{#1}}{(2\pi)^{3}}\left(-\frac{i}{2}\right)\:}}
+\newcommand{\intpq}{\int{\frac{d^{3}\B{p}d^{3}\B{q}}{(2\pi)^{3}(2\pi)^{3}}\:}}
+\newcommand{\intEpq}{\int{\frac{d^{3}\B{p}d^{3}\B{q}}{(2\pi)^{3}(2\pi)^{3}}\frac{1}{2E_{p}2E_{q}}\:}}
+\newcommand{\inttt}[1]{\int{d^{3}\B{#1}\:}}
+\newcommand{\intx}[1]{\int{d#1\:}}
+\newcommand{\intiv}[1]{\int{d^{4}#1\:}}
+\newcommand{\dotp}[2]{\B{#1}\cdot\B{#2}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\arr}{\rightarrow}
+\newcommand{\phipb}{\phi^{*}}
+\newcommand{\phipf}{\phi_{*}}
+\renewcommand{\b}[1]{\textbf{#1}}
+\renewcommand{\i}[1]{\textit{#1}}
+\newcommand{\Tc}{\mathcal{T}}
+\newcommand{\Ts}[2]{\mathcal{T}_{#1}(\mathcal{#2})}
+\newcommand{\Ds}[2]{\mathcal{T}^{*}_{#1}(\mathcal{#2})}
+\renewcommand{\O}{\mathcal{O}}
+\newcommand{\ol}[1]{\overline{#1}}
+\newcommand{\ul}[1]{\underline{#1}}
+\newcommand{\Dd}{\mathcal{D}}
+\newcommand{\half}{\tfrac{1}{2}}
+\newcommand{\bs}[1]{\boldsymbol{#1}}
+\newcommand{\tl}[1]{\tilde{#1}}
+\newcommand{\lorentz}{\mathbb{L}}
+\newcommand{\matr}[2]{\left(\begin{array}{#1} #2\end{array}\right)}
+\newcommand{\ee}{{\'e}}
+\newcommand{\PP}{\mathbb{P}}
+\newcommand{\EXP}[1]{\left\langle #1 \right\rangle}
+\newcommand{\Tp}[1]{\tensor{\perp}{#1}}
+\newcommand{\TRc}[1]{\tensor{\mathcal{R}}{#1}}
+\newcommand{\TR}[1]{\tensor{R}{#1}}
+\newcommand{\TK}[1]{\tensor{\kappa}{#1}}
+\newcommand{\TN}[2]{\tensor{N}{_{#1}^{#2}}}
+\newcommand{\TNs}[2]{\tensor{{N^{*}}}{_{\dot{#1}}^{\dot{#2}}}}
+\newcommand{\dal}{\dot{\alpha}}
+\newcommand{\dbe}{\dot{\beta}}
+\newcommand{\ins}{\int{\frac{d\phi d\psi_{1}d\psi_{2}}{\sqrt{2\pi}}\:}}
+\newcommand{\diraceq}{(i\cancel{\partial}-m)\psi}
+\newcommand{\conjdirac}{\ol{\psi}(-\overleftarrow{\cancel{\partial}}-m)}
+\newcommand{\cp}{\cancel{\partial}}
+\newcommand{\gam}[1]{\gamma^{#1}}
+\newcommand{\gamu}{\gam{\mu}}
+\newcommand{\ganu}{\gam{\nu}}
+\newcommand{\gamo}{\matr{cc}{0&I_{2}\\I_{2}&0}}
+\newcommand{\gami}{\matr{cc}{0 &\sigma^{i}\\-\sigma{i}&0}}
+\newcommand{\can}[1]{\cancel{#1}}
+\newcommand{\pr}{\partial}
+\newcommand{\PL}{\frac{1}{2}(1-\gam{5})}
+\newcommand{\PR}{\frac{1}{2}(1+\gam{5})}
+\newcommand{\psib}{\ol{\psi}}
+\newcommand{\chib}{\ol{\chi}}
+\newcommand{\cD}{\cancel{D}}
+\newcommand{\hP}{\hat{P}}
+\newcommand{\hT}{\hat{T}}
+\newcommand{\poinc}{Poincar{\'e} }
+\newcommand{\schro}{Schr{\"o}dinger }
+\newcommand{\Pc}{\mathcal{P}}
+\newcommand{\itmze}[1]{\begin{itemize} #1 \end{itemize}}
+\newcommand{\tM}{\tilde{\M}}
+\newcommand{\Lg}{\mathfrak{g}}
+\newcommand{\Tf}[1]{\tensor{f}{#1}}
+\newcommand{\PB}[2]{\left\{#1,#2\right\}_{PB}}
+\newcommand{\nF}{(-)^{F}}
+\newcommand{\hC}{\hat{C}}
+\newcommand{\schw}{\left(1-\frac{2M}{r}\right)}
+\newcommand{\schwarzchild}{ds^{2}=-\schw dt^{2}+\schw^{-1}dr^{2}+r^{2}d\Omega^{2}}
+\newcommand{\Dxi}{\D{}{x^{i}}}
+\newcommand{\Dxj}{\D{}{x^{j}}}
+\newcommand{\dxi}{dx^{i}}
+\newcommand{\dxj}{dx^{j}}
+\newcommand{\Hc}{\mathcal{H}}
+\newcommand{\inttsig}{\int{dt\:}\oint{d\sigma\:}}
+\newcommand{\dD}[2]{\frac{\delta #1}{\delta #2}}
+\newcommand{\lrarr}{\leftrightarrow}
+\newcommand{\dX}{\dot{X}}
+\newcommand{\Xd}{{X'}}
+\newcommand{\enumi}[1]{\begin{enumerate}[(i).]#1\end{enumerate}}
+\newcommand{\Uc}{\mathcal{U}}
+\newcommand{\TB}[1]{\tensor{B}{#1}}
+\newcommand{\lrb}[1]{\left(#1\right)}
+\newcommand{\lrsq}[1]{\left[#1\right]}
+\newcommand{\lrc}[1]{\left\{#1\right\}}
+\newcommand{\intt}{\int{dt\:}}
+\newcommand{\tal}{\tilde{\alpha}}
+\newcommand{\al}{\alpha}
+\newcommand{\piT}{\pi T}
+\newcommand{\sqfr}[2]{\sqrt{\frac{#1}{#2}}}
+\newcommand{\frsqi}[2]{\frac{\sqrt{#1}}{#2}}
+\newcommand{\frsqii}[2]{\frac{#1}{\sqrt{#2}}}
+\newcommand{\tL}{\tilde{L}}
+\newcommand{\Half}{\frac{1}{2}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\intpisig}{\int_{0}^{\pi}d\sigma\:}
+\newcommand{\vac}{\ket{0}}
+\newcommand{\phys}{\ket{\text{phys}}}
+\newcommand{\hal}{\hat{\alpha}}
+\newcommand{\hN}{\hat{N}}
+\newcommand{\hA}{\hat{A}}
+\newcommand{\TP}[1]{\tensor{P}{#1}}
+\newcommand{\TBh}[1]{\tensor{\hat{B}}{#1}}
+\newcommand{\hS}{\hat{S}}
+\newcommand{\Tab}[1]{\tensor{#1}{^a_b}}
+\newcommand{\omh}{\hat{\omega}}
+\newcommand{\sigh}{\hat{\sigma}}
+\newcommand{\Bh}{\hat{B}}
+\newcommand{\hB}{\Bh}
+\newcommand{\Braq}[1]{\Braket{q_{f}}{#1}{q_{i}}}
+\newcommand{\inttx}{\intx{^3\B{x}}}
+\newcommand{\pb}[1]{\{#1\}_{\text{PB}}}
+\newcommand{\delal}{\delta_{\alpha}}
+\newcommand{\delxi}{\delta_{\xi}}
+\newcommand{\deleps}{\delta_{\epsilon}}
+\newcommand{\intsig}{\oint d\sigma\:}
+\newcommand{\bal}{\bs{\al}}
+\newcommand{\tbal}{\tilde{\bal}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\Qc}{\mathcal{Q}}
+\newcommand{\TF}[1]{\tensor{F}{#1}}
+\newcommand{\scri}{\mathcal{I}}
+\newcommand{\scrip}{\scri^{+}}
+\newcommand{\scrim}{\scri^{-}}
+\newcommand{\Bc}{\mathcal{B}}
+\newcommand{\Wc}{\mathcal{W}}
+\newcommand{\Ac}{\mathcal{A}}
+\newcommand{\Up}{U^{+}}
+\newcommand{\Vp}{V^{+}}
+\newcommand{\Um}{U^{-}}
+\newcommand{\Vm}{V^{-}}
+\newcommand{\Mg}{(\M,g)}
+\newcommand{\s}{\star}
+\newcommand{\Sc}{\mathcal{S}}
+\newcommand{\alb}{\bar{\al}}
+\newcommand{\nsg}{\vartriangleleft}
+\newcommand{\idl}{\vartriangleleft}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\F}{\mathbb{F}}
+\newcommand{\norm}[1]{\left|\left| #1 \right|\right|}
+\newcommand{\intR}[2]{\int_{\mathbb{R}} #1 \, d#2}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\eqsys}[1]{\begin{subequations}\algn{#1}\end{subequations}}
+\newcommand{\eqsyslab}[2]{\begin{subequations} \label{eq:#2} \algn{#1}\end{subequations}}
+\newcommand{\Fc}{\mathcal{F}}
+\newcommand{\EE}[1]{\mathbb{E}\lrsq{#1}}
+\newcommand{\EEC}[2]{\EE{\left. #1 \right| #2}}
+\newcommand{\intab}{\int_{a}^{b}}
+\newcommand{\DD}[2]{\frac{D #1}{D #2}}
+\newcommand{\eps}{\epsilon}
+\newcommand{\spd}{symmetric positive definite }
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\hch}{\hat{\chi}}
+\newcommand{\hps}{\hat{\psi}}
+\newcommand{\be}{\beta}
+\newcommand{\TJi}[1]{\tensor{(J^{-1})}{#1}}
+\newcommand{\Db}{\mathbb{D}}
+\newcommand{\abs}[1]{\left| #1 \right|}
+\newcommand{\lesim}{\lesssim}
+\newcommand{\lessim}{\lesssim}
+\newcommand{\lamdba}{\lambda}
+\newcommand{\indnt}{\text{  }\text{  }\text{  }\text{  }\text{  }\text{  }\text{  }\text{  }}
+\newcommand{\bbk}{\bar{\bar{\kappa}}}
+\newcommand{\ok}{\tfrac{1}{\kappa}}
+\newcommand{\vk}{\lrb{v,\tfrac{1}{\kappa}}}
+\newcommand{\vkp}{\lrb{v',\tfrac{1}{\kappa}}}
+
+
+
+
+\DeclareMathOperator{\diag}{diag}
+\DeclareMathOperator{\Tr}{Tr}
+\DeclareMathOperator{\Div}{div}
+\DeclareMathOperator{\curl}{curl}
+\DeclareMathOperator{\ad}{ad}
+\DeclareMathOperator{\Ad}{Ad}
+\DeclareMathOperator{\Orb}{Orb}
+\DeclareMathOperator{\Stab}{Stab}
+\DeclareMathOperator{\sgn}{sgn}
+\DeclareMathOperator{\vol}{vol}
+\DeclareMathOperator{\Span}{span}
+\DeclareMathOperator{\sign}{sign}
+\DeclareMathOperator{\Int}{Int}
+\DeclareMathOperator{\area}{area}
+\DeclareMathOperator{\hcf}{hcf}
+\DeclareMathOperator{\lcm}{lcm}
+\DeclareMathOperator{\Syl}{Syl}
+\DeclareMathOperator{\im}{Im}
+\DeclareMathOperator{\Ann}{Ann}
+\DeclareMathOperator{\Cov}{Cov}
+\DeclareMathOperator{\mse}{mse}
+\DeclareMathOperator{\Var}{Var}
+\DeclareMathOperator{\Diff}{Diff}
+\DeclareMathOperator{\supp}{supp}
+\DeclareMathOperator{\cn}{cn}
+\DeclareMathOperator{\sn}{sn}
+\DeclareMathOperator{\dn}{dn}
+\DeclareMathOperator{\cosech}{cosech}
+\DeclareMathOperator{\sech}{sech}
+
+
+
+
+
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}[section] 
+\newtheorem{examp}[defn]{Example}
+\theoremstyle{plain}
+\newtheorem{lem}[defn]{Lemma}
+\newtheorem{thm}[defn]{Theorem}
+\newtheorem{cor}[defn]{Corollary}
+\newtheorem{prop}[defn]{Proposition}
+\newtheorem{conj}[defn]{Conjecture}
+
+\newcommand{\Theoremproof}[2]{
+\begin{thm}
+#1 
+\end{thm}
+\begin{proof}
+#2
+\end{proof}
+}
+\newcommand{\Theoremnoproof}[1]{
+\begin{thm}
+#1 
+\end{thm}
+}
+\newcommand{\Lemmaproof}[2]{
+\begin{lem}
+#1 
+\end{lem}
+\begin{proof}
+#2
+\end{proof}
+}
+\newcommand{\Lemmanoproof}[1]{
+\begin{lem}
+#1 
+\end{lem}
+}
+\newcommand{\Corollaryproof}[2]{
+\begin{cor}
+#1 
+\end{cor}
+\begin{proof}
+#2
+\end{proof}
+}
+\newcommand{\Corollarynoproof}[1]{
+\begin{cor}
+#1 
+\end{cor}
+}
+\newcommand{\Definition}[2]{
+\begin{defn}[#1]
+#2 
+\end{defn}
+}
+\newcommand{\Propproof}[2]{
+\begin{prop}
+#1 
+\end{prop}
+\begin{proof}
+#2
+\end{proof}
+}
+\newcommand{\Propnoproof}[1]{
+\begin{prop}
+#1 
+\end{prop}
+}
+
+\crefname{lem}{Lemma}{Lemmas}
+\Crefname{lem}{Lemma}{Lemmas}
+\crefname{thm}{Theorem}{Theorems}
+\Crefname{thm}{Theorem}{Theorems}
+\crefname{def}{Definition}{Definitions}
+\Crefname{def}{Definition}{Definitions}
+\crefname{examp}{Example}{Examples}
+\Crefname{examp}{Example}{Examples}
+\crefname{figure}{Figure}{Figures}%
+\crefname{table}{Table}{Tables}
+
+
+
+\newcommand{\makeplots}[8]{
+
+\IfFileExists{./MESHES/#2_#3/results_std/plots/#1_allyears_#4_#5_layer_#8.png}{
+\IfFileExists{./MESHES/#2_#3/results_std/plots/#1_allyears_#6_#7_layer_#8.png}{
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.45\textwidth}
+  			\centering
+ 			 \includegraphics[width=0.9\linewidth]{./MESHES/#2_#3/results_std/plots/#1_allyears_#4_#5_layer_#8.png}
+		\end{subfigure}%
+		\begin{subfigure}{0.45\textwidth}
+ 			 \centering
+ 			 \includegraphics[width=0.9\linewidth]{./MESHES/#2_#3/results_std/plots/#1_allyears_#6_#7_layer_#8.png}
+		\end{subfigure}
+	\end{figure}
+	}
+	\text{ }
+}
+
+
+
+\IfFileExists{./MESHES/#2_#3/results_std/plots/#1_fluct_sp_#4_#5_layer_#8.png}{
+\IfFileExists{./MESHES/#2_#3/results_std/plots/#1_fluct_sp_#6_#7_layer_#8.png}{
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.45\textwidth}
+  			\centering
+ 			 \includegraphics[width=0.9\linewidth]{./MESHES/#2_#3/results_std/plots/#1_fluct_sp_#4_#5_layer_#8.png}
+		\end{subfigure}%
+		\begin{subfigure}{0.45\textwidth}
+ 			 \centering
+ 			 \includegraphics[width=0.9\linewidth]{./MESHES/#2_#3/results_std/plots/#1_fluct_sp_#6_#7_layer_#8.png}
+		\end{subfigure}
+	\end{figure}
+}
+	\text{ }
+}
+
+\IfFileExists{./MESHES/#2_#3/results_std/plots/#1_fluct_t_#4_#5_layer_#8.png}{
+\IfFileExists{./MESHES/#2_#3/results_std/plots/#1_fluct_t_#6_#7_layer_#8.png}{
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.45\textwidth}
+  			\centering
+ 			 \includegraphics[width=0.9\linewidth]{./MESHES/#2_#3/results_std/plots/#1_fluct_t_#4_#5_layer_#8.png}
+		\end{subfigure}%
+		\begin{subfigure}{0.45\textwidth}
+ 			 \centering
+ 			 \includegraphics[width=0.9\linewidth]{./MESHES/#2_#3/results_std/plots/#1_fluct_t_#6_#7_layer_#8.png}
+		\end{subfigure}
+	\end{figure}
+}
+	\text{ }
+}
+
+
+}
+
+\newcommand{\layernotimeplot}[4]{
+
+\IfFileExists{./MESHES/#2_#3/results_std/plots/#1_tav_layer_#4.png}{
+	\begin{figure}[H]
+		\centering
+		 \includegraphics[width=0.45\linewidth]{./MESHES/#2_#3/results_std/plots/#1_tav_layer_#4.png}
+	\end{figure}
+}
+
+}
+
+\newcommand{\timenolayerplot}[7]{
+
+\IfFileExists{./MESHES/#2_#3/results_std/plots/#1_strat_#4_#5.png}{
+\IfFileExists{./MESHES/#2_#3/results_std/plots/#1_strat_#6_#7.png}{
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.45\textwidth}
+  			\centering
+ 			 \includegraphics[width=0.9\linewidth]{./MESHES/#2_#3/results_std/plots/#1_strat_#4_#5.png}
+		\end{subfigure}%
+		\begin{subfigure}{0.45\textwidth}
+ 			 \centering
+ 			 \includegraphics[width=0.9\linewidth]{./MESHES/#2_#3/results_std/plots/#1_strat_#6_#7.png}
+		\end{subfigure}
+	\end{figure}
+	}
+		\text{ }
+}
+
+}
+
+\newcommand{\nolayernotimeplot}[3]{
+
+\IfFileExists{./MESHES/#2_#3/results_std/plots/#1_timeseries.png}{
+	\begin{figure}[H]
+		\centering
+		 \includegraphics[width=0.45\linewidth]{./MESHES/#2_#3/results_std/plots/#1_timeseries.png}
+	\end{figure}
+}
+
+\IfFileExists{./MESHES/#2_#3/results_std/plots/#1_tav.png}{
+	\begin{figure}[H]
+		\centering
+		 \includegraphics[width=0.45\linewidth]{./MESHES/#2_#3/results_std/plots/#1_tav.png}
+	\end{figure}
+}
+
+}
+
+
+\newcommand{\makeplotsnolayers}[7]{
+
+\IfFileExists{./MESHES/#2_#3/results_std/plots/#1_allyears_#4_#5.png}{
+\IfFileExists{./MESHES/#2_#3/results_std/plots/#1_allyears_#6_#7.png}{
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.45\textwidth}
+  			\centering
+ 			 \includegraphics[width=0.9\linewidth]{./MESHES/#2_#3/results_std/plots/#1_allyears_#4_#5.png}
+		\end{subfigure}%
+		\begin{subfigure}{0.45\textwidth}
+ 			 \centering
+ 			 \includegraphics[width=0.9\linewidth]{./MESHES/#2_#3/results_std/plots/#1_allyears_#6_#7.png}
+		\end{subfigure}
+	\end{figure}
+	}
+		\text{ }
+}
+
+\IfFileExists{./MESHES/#2_#3/results_std/plots/#1_fluct_sp_#4_#5.png}{
+\IfFileExists{./MESHES/#2_#3/results_std/plots/#1_fluct_sp_#6_#7.png}{
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.45\textwidth}
+  			\centering
+ 			 \includegraphics[width=0.9\linewidth]{./MESHES/#2_#3/results_std/plots/#1_fluct_sp_#4_#5.png}
+		\end{subfigure}%
+		\begin{subfigure}{0.45\textwidth}
+ 			 \centering
+ 			 \includegraphics[width=0.9\linewidth]{./MESHES/#2_#3/results_std/plots/#1_fluct_sp_#6_#7.png}
+		\end{subfigure}
+	\end{figure}
+	}
+		\text{ }
+}
+
+\IfFileExists{./MESHES/#2_#3/results_std/plots/#1_fluct_t_#4_#5.png}{
+\IfFileExists{./MESHES/#2_#3/results_std/plots/#1_fluct_t_#6_#7.png}{
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.45\textwidth}
+  			\centering
+ 			 \includegraphics[width=0.9\linewidth]{./MESHES/#2_#3/results_std/plots/#1_fluct_t_#4_#5.png}
+		\end{subfigure}%
+		\begin{subfigure}{0.45\textwidth}
+ 			 \centering
+ 			 \includegraphics[width=0.9\linewidth]{./MESHES/#2_#3/results_std/plots/#1_fluct_t_#6_#7.png}
+		\end{subfigure}
+	\end{figure}
+	}
+		\text{ }
+}
+
+}
+
+\newcommand{\allplot}[9]{
+
+\makeplots{unod}{#1}{#2}{#3}{#4}{#5}{#6}{#7}
+\makeplots{unod}{#1}{#2}{#3}{#4}{#5}{#6}{#8}
+\makeplots{unod}{#1}{#2}{#3}{#4}{#5}{#6}{#9}
+\layernotimeplot{unod}{#1}{#2}{#7}
+\layernotimeplot{unod}{#1}{#2}{#8}
+\layernotimeplot{unod}{#1}{#2}{#9}
+\timenolayerplot{unod}{#1}{#2}{#3}{#4}{#5}{#6}
+\nolayernotimeplot{unod}{#1}{#2}
+
+\newpage
+\makeplots{vnod}{#1}{#2}{#3}{#4}{#5}{#6}{#7}
+\makeplots{vnod}{#1}{#2}{#3}{#4}{#5}{#6}{#8}
+\makeplots{vnod}{#1}{#2}{#3}{#4}{#5}{#6}{#9}
+\layernotimeplot{vnod}{#1}{#2}{#7}
+\layernotimeplot{vnod}{#1}{#2}{#8}
+\layernotimeplot{vnod}{#1}{#2}{#9}
+\timenolayerplot{vnod}{#1}{#2}{#3}{#4}{#5}{#6}
+\nolayernotimeplot{vnod}{#1}{#2}
+
+\newpage
+\makeplots{w}{#1}{#2}{#3}{#4}{#5}{#6}{#7}
+\makeplots{w}{#1}{#2}{#3}{#4}{#5}{#6}{#8}
+\makeplots{w}{#1}{#2}{#3}{#4}{#5}{#6}{#9}
+\layernotimeplot{w}{#1}{#2}{#7}
+\layernotimeplot{w}{#1}{#2}{#8}
+\layernotimeplot{w}{#1}{#2}{#9}
+\timenolayerplot{w}{#1}{#2}{#3}{#4}{#5}{#6}
+\nolayernotimeplot{w}{#1}{#2}
+
+\newpage
+\makeplots{temp}{#1}{#2}{#3}{#4}{#5}{#6}{#7}
+\makeplots{temp}{#1}{#2}{#3}{#4}{#5}{#6}{#8}
+\makeplots{temp}{#1}{#2}{#3}{#4}{#5}{#6}{#9}
+\layernotimeplot{temp}{#1}{#2}{#7}
+\layernotimeplot{temp}{#1}{#2}{#8}
+\layernotimeplot{temp}{#1}{#2}{#9}
+\timenolayerplot{temp}{#1}{#2}{#3}{#4}{#5}{#6}
+\nolayernotimeplot{temp}{#1}{#2}
+
+\newpage
+\makeplots{rhof}{#1}{#2}{#3}{#4}{#5}{#6}{#7}
+\makeplots{rhof}{#1}{#2}{#3}{#4}{#5}{#6}{#8}
+\makeplots{rhof}{#1}{#2}{#3}{#4}{#5}{#6}{#9}
+\layernotimeplot{rhof}{#1}{#2}{#7}
+\layernotimeplot{rhof}{#1}{#2}{#8}
+\layernotimeplot{rhof}{#1}{#2}{#9}
+\timenolayerplot{rhof}{#1}{#2}{#3}{#4}{#5}{#6}
+\nolayernotimeplot{rhofmid}{#1}{#2}
+
+\newpage
+\makeplots{ke}{#1}{#2}{#3}{#4}{#5}{#6}{#7}
+\makeplots{ke}{#1}{#2}{#3}{#4}{#5}{#6}{#8}
+\makeplots{ke}{#1}{#2}{#3}{#4}{#5}{#6}{#9}
+\layernotimeplot{ke}{#1}{#2}{#7}
+\layernotimeplot{ke}{#1}{#2}{#8}
+\layernotimeplot{ke}{#1}{#2}{#9}
+\timenolayerplot{ke}{#1}{#2}{#3}{#4}{#5}{#6}
+\nolayernotimeplot{ke}{#1}{#2}
+
+\newpage
+\makeplotsnolayers{ssh}{#1}{#2}{#3}{#4}{#5}{#6}
+\timenolayerplot{ssh}{#1}{#2}{#3}{#4}{#5}{#6}
+\nolayernotimeplot{ssh}{#1}{#2}
+
+}
+
+\newcommand{\momplot}[3]{
+
+\IfFileExists{./DATA/513/#1_#2_#3.png}{
+	\begin{figure}[H]
+		\centering
+		 \includegraphics[width=\linewidth]{./DATA/513/#1_#2_#3.png}
+	\end{figure}
+}
+
+}
+
+\newcommand{\momplottav}[3]{
+
+\IfFileExists{./DATA/513/#1_tav_#2_#3.png}{
+	\begin{figure}[H]
+		\centering
+		 \includegraphics[width=\linewidth]{./DATA/513/#1_tav_#2_#3.png}
+	\end{figure}
+}
+
+}
+
+\newcommand{\mitgcmplot}[3]{
+
+\IfFileExists{../../../../../Documents/MITgcm/verification/tutorial_baroclinic_gyre/results/plots/#1_#2_#3.png}{
+	\begin{figure}[H]
+		\centering
+		 \includegraphics[width=0.7\linewidth]{../../../../../Documents/MITgcm/verification/tutorial_baroclinic_gyre/results/plots/#1_#2_#3.png}
+	\end{figure}
+}
+
+}

@@ -1,0 +1,210 @@
+\documentclass[10pt]{article}
+
+\input{../Preamble}
+
+\begin{document}
+\title{MOM: Rotating Shallow Water Equations}
+\date{}
+\maketitle
+
+\section{Model Set-up}
+
+We solve the rotating shallow water equations on grids of size $129\times 129$, $257\times 257$ and $513\times 513$ nodes.\\
+\linebreak
+Explicitly, these equations are:
+\eqsyslab{
+	\PD{\B{u}_{1}}{t} + \B{u}_{1}\cdot \nabla\B{u}_{1}+ \B{f}\times \B{u}_{1} & = - g\nabla h_{1} + \bs{\tau}\\ 
+	\PD{\B{u}_{2}}{t} + \B{u}_{2}\cdot \nabla\B{u}_{2}+ \B{f}\times \B{u}_{2} & = - g\nabla h_{2} - \frac{\rho_{1}g}{\rho_{2}} \nabla \eta_{1} \\
+	 \PD{\B{u}_{3}}{t} + \B{u}_{3}\cdot \nabla\B{u}_{3}+ \B{f}\times \B{u}_{3} & = - g\nabla h_{3} - \frac{\rho_{2}g}{\rho_{3}} \nabla \eta_{2} - \frac{\rho_{1}g}{\rho_{3}} \nabla \eta_{1} \\
+	 \PD{\eta_{1}}{t} + \nabla\cdot\lrb{\eta_{1}\B{u}_{1}} & = r(\eta_{r} - \eta_{1}) \\
+	  \PD{\eta_{2}}{t} + \nabla\cdot\lrb{\eta_{2}\B{u}_{2}} & = 0 \\
+	   \PD{\eta_{3}}{t} + \nabla\cdot\lrb{\eta_{3}\B{u}_{3}} & = 0 
+}{RSW3}
+where $z = h_{i}(x,y)$ gives the equation for the upper surface of layer $i$, and $\eta_{i} = h_{i} - h_{i+1}$ is the layer thickness. \\
+\linebreak
+We use a $\beta$-plane approximation $\B{f} = \B{e}_{3}(f_{0} + \beta y)$. \\
+\linebreak
+$\bs{\tau}$ is a wind forcing given by:
+\algnn{
+	\tau_{x}(x,y) & = \frac{A}{2}\lrsq{1 + \cos\lrb{\frac{2\pi(mx -y + b)}{\sqrt{1 + m}L}} + a\frac{y}{L}} \\
+	\tau_{y}(x,y) & = m\tau_{x}(x,y)
+}
+And $\eta_{r}$ is a relaxation profile given by:
+\eqnn{
+	\eta_{r} = H_{1} + \Delta h \sin\lrb{\frac{2\pi(mx - y + b + \Delta b)}{L/8}}
+}
+\section{Spatial Filtering}
+
+Now let us suppose we take our data $\psi(\lrc{x_{i}}_{i=1}^{N^{2}})$ defined on an $N\times N$ grid and we wish to filter it to get data $\ol{\psi}(\lrc{\bar{x}_{j}}_{j=1}^{n^{2}})$ defined on an $n\times n$ grid that is a subset of the original grid. To ensure this is the case we choose $n$ to be even. This means there will be a node from the original grid located at the centre of each filter window. So we can also define the original data projected onto the coarser grid, $\mathbb{P}\psi(\lrc{x_{i}}_{i=1}^{n^{2}})$.\\
+\linebreak
+Then let us define the fluctuation $\psi' = \psi - \ol{\psi}$, which is defined on the fine grid. This means we can decompose the data $\psi = \ol{\psi} + \psi'$ into a 'large-scale' part and a 'small-scale' part. Decomposing $\B{u}, \eta$, etc in this way and substituting the results into the equations of motion, we find, for example:
+\algnn{
+	\PD{\ol{\B{u}}_{1}}{t} + \ol{\B{u}}_{1}\cdot\ol{\nabla} \ol{\B{u}}_{1} + \ol{\B{f}}\times\ol{\B{u}}_{1}= - g\ol{\nabla}\,\ol{h}_{1} +   \ol{\bs{\tau}} + \B{F}_{1}
+}
+where:
+\eqnn{
+	\B{F} = - \ol{\B{u}}_{1}\cdot \ol{\nabla \B{u}_{1}'} -\ol{ \B{u}_{1}'\cdot\nabla \ol{\B{u}}_{1}} - \ol{ \B{u}_{1}' \cdot \nabla\B{u}_{1}' }  - g\ol{ \nabla h_{1}'} + \ol{\B{f}}\times\ol{\B{u}}_{1} - \ol{\B{f}\times\B{u}_{1}}
+}
+More detail on this is given as follows:\\
+\linebreak
+Suppose we have $\psi$ defined on an $N\times N$ grid $Q$ and $\bar{\psi}$ defined on an $n\times n$ grid $\ol{Q}$ with $n \ll N$ such that the two grids cover approximately the same area but every node $\ol{\B{x}}_{kl}$ of $\ol{Q}$ is given by a node $\B{x}_{ij}$ in $Q$ and every cell $A_{ij}$ of $Q$ is a subset of a cell $\ol{A}_{kl}$ of $\ol{Q}$. \\
+\linebreak
+Then we may write:
+\eqnn{
+	\ol{\psi}(\ol{\B{x}}_{kl}) = \frac{1}{M^{2}}\sum_{i,j : A_{ij}\subset \ol{A}_{kl}}  \psi(\ol{\B{x}}_{ij})
+}
+where $M = \left \lfloor{N/n}\right \rfloor$ gives the number of $Q$-cells along the edge of one $\ol{Q}$-cell. \\
+\linebreak
+Note that if we use a straightforward finite-difference approach to calculate the gradients then the average of the gradient of a large-scale quantity is given by the large-scale gradient:
+\algnn{
+	\ol{\pr_{x}\ol{\psi}}(\B{x}_{kl}) & = \frac{1}{M^{2}} \sum_{i,j : A_{ij}\subset \ol{A}_{kl}}( \pr_{x} \ol{\psi})(\B{x}_{ij}) \\
+								& = \frac{1}{M^{2}} \sum_{i,j : A_{ij}\subset \ol{A}_{kl}} \lrsq{\ol{\psi}(\B{x}_{(i+1)j}) - \ol{\psi}(\B{x}_{(i-1)j})}/2\Delta x \\
+								& = \frac{1}{M^{2}} \sum_{j=1}^{M}\sum_{i = 1}^{M} \lrsq{\ol{\psi}(\B{x}_{(i+1)j}) - \ol{\psi}(\B{x}_{(i-1)j})}/2\Delta x \\
+								& = \frac{1}{M^{2}} \sum_{j=1}^{M}\lrb{\frac{{\ol{\psi}(\B{x}_{2j}) - \ol{\psi}(\B{x}_{0j})}}{2\Delta x} + \frac{{\ol{\psi}(\B{x}_{(M+1)j}) - \ol{\psi}(\B{x}_{(M-1)j})}}{2\Delta x }+  \sum_{i = 2}^{M-1} \frac{{\ol{\psi}(\B{x}_{(i+1)j}) - \ol{\psi}(\B{x}_{(i-1)j})}}{2\Delta x }}\\
+									& = \frac{1}{M^{2}} \sum_{j=1}^{M}\lrb{\frac{{\ol{\psi}(\ol{\B{x}}_{kl}) - \ol{\psi}(\ol{\B{x}}_{(k-1)l})}}{2\Delta x} + \frac{{\ol{\psi}(\ol{\B{x}}_{(k+1)l}) - \ol{\psi}(\ol{\B{x}}_{kl})}}{2\Delta x }+  \sum_{i = 2}^{M-1} \frac{{\ol{\psi}(\ol{\B{x}}_{kl}) - \ol{\psi}(\ol{\B{x}}_{kl})}}{2\Delta x }}\\
+									& = \frac{1}{M^{2}} \sum_{j=1}^{M}\frac{\ol{\psi}(\ol{\B{x}}_{(k+1)l}) - \ol{\psi}(\ol{\B{x}}_{(k-1)l})}{2\Delta x}  \\
+									& = \frac{\ol{\psi}(\ol{\B{x}}_{(k+1)l}) - \ol{\psi}(\ol{\B{x}}_{(k-1)l})}{2M\Delta x}  \\
+									& = \pr_{\ol{x}}\,\ol{\psi}\lrb{\ol{\B{x}}_{kl}}
+}
+If this does not hold then we simply need to add an extra term to the forcings $\B{F}_{i}$ and $\B{G}_{i}$.\\
+\linebreak
+Applying the averaging procedure to the remaining equations of motion, we obtain:
+\eqsyslab{
+	\PD{\ol{\B{u}}_{1}}{t} + \ol{\B{u}}_{1}\cdot\ol{\nabla} \ol{\B{u}}_{1} + \ol{\B{f}}\times\ol{\B{u}}_{1} & = - g\ol{\nabla}\,\ol{h}_{1} +   \ol{\bs{\tau}} + \B{F}_{1} \\
+	\PD{\B{u}_{2}}{t} + \ol{\B{u}}_{2}\cdot\ol{\nabla} \ol{\B{u}}_{2}  +  \ol{\B{f}}\times \ol{\B{u}}_{2} & = - g\ol{\nabla} \ol{h}_{2} - \frac{\rho_{1}g}{\rho_{2}} \ol{\nabla} \ol{\eta}_{1} + \B{F}_{2}\\
+	 \PD{\B{u}_{3}}{t} + \ol{\B{u}}_{3}\cdot\ol{\nabla} \ol{\B{u}}_{3}  +  \ol{\B{f}}\times \ol{\B{u}}_{3} & = - g\ol{\nabla}\ol{ h}_{3} - \frac{\rho_{2}g}{\rho_{1}} \ol{\nabla} \ol{\eta}_{2} - \frac{\rho_{1}g}{\rho_{3}} \ol{\nabla} \ol{\eta}_{1} + \B{F}_{3}\\
+	 \PD{\ol{\eta}_{1}}{t} + \ol{\nabla}\cdot\lrb{\ol{\eta}_{1}\ol{\B{u}}_{1}} & = r(\ol{\eta}_{r} - \ol{\eta}_{1}) + \B{G}_{1} \\
+	  \PD{\ol{\eta}_{2}}{t} + \ol{\nabla}\cdot\lrb{\ol{\eta}_{2}\ol{\B{u}}_{2}} & = \B{G}_{2} \\
+	   \PD{\ol{\eta}_{3}}{t} +\ol{ \nabla}\cdot\lrb{\ol{\eta}_{3}\ol{\B{u}}_{3}} & = \B{G}_{3} \\
+}{LSeqs}
+
+where:
+
+\algnn{
+	\B{F}_{1} & = - \ol{\B{u}}_{1}\cdot \ol{\nabla \B{u}_{1}'} -\ol{ \B{u}_{1}'\cdot\nabla \ol{\B{u}}_{1}} - \ol{ \B{u}_{1}' \cdot \nabla\B{u}_{1}' }  - g\ol{ \nabla h_{1}'} + \ol{\B{f}}\times\ol{\B{u}}_{1} - \ol{\B{f}\times\B{u}_{1}}\\
+		\B{F}_{2} &= - \ol{\B{u}}_{2}\cdot \ol{\nabla \B{u}_{2}'} -\ol{ \B{u}_{2}'\cdot\nabla \ol{\B{u}}_{2}} - \ol{ \B{u}_{2}' \cdot \nabla\B{u}_{2}' }  - g\ol{ \nabla h_{2}'} - \frac{\rho_{1}g}{\rho_{2}}\ol{\nabla \eta_{1}'} + \ol{\B{f}}\times\ol{\B{u}}_{2} - \ol{\B{f}\times\B{u}_{2}}\\
+			\B{F}_{3} &= - \ol{\B{u}}_{3}\cdot \ol{\nabla \B{u}_{3}'} -\ol{ \B{u}_{3}'\cdot\nabla \ol{\B{u}}_{3}} - \ol{ \B{u}_{3}' \cdot \nabla\B{u}_{3}' }  - g\ol{ \nabla h_{3}'} -\frac{\rho_{2}g}{\rho_{1}} \ol{\nabla\eta_{2}'} - \frac{\rho_{1}g}{\rho_{3}}\ol{\nabla\eta_{1}'}  + \ol{\B{f}}\times\ol{\B{u}}_{3} - \ol{\B{f}\times\B{u}_{3}} 
+			}
+and:
+\algnn{
+			\B{G}_{1} & = - \ol{\nabla\cdot \lrsq{\ol{\eta}_{1} \B{u}_{1}'}} - \ol{\nabla\cdot \lrsq{\eta_{1}' \ol{\B{u}}_{1}}} - \ol{\nabla\cdot\lrsq{\eta'\B{u}_{1}'}}\\
+			\B{G}_{2} & = - \ol{\nabla\cdot \lrsq{\ol{\eta}_{2} \B{u}_{2}'}} - \ol{\nabla\cdot \lrsq{\eta_{2}' \ol{\B{u}}_{2}}} - \ol{\nabla\cdot\lrsq{\eta_{2}'\B{u}_{2}'}}\\
+			\B{G}_{3} & = - \ol{\nabla\cdot \lrsq{\ol{\eta}_{3} \B{u}_{3}'}} - \ol{\nabla\cdot \lrsq{\eta_{3}' \ol{\B{u}}_{3}}} - \ol{\nabla_{3}\cdot\lrsq{\eta_{3}'\B{u}_{3}'}}
+}
+
+\subsection{Results}
+Below are plots of data, along with the spatially-filtered data and the difference between the full fields and the filtered fields:
+
+\momplot{u}{0}{0}
+\momplot{u}{0}{1}
+\momplot{u}{0}{2}
+\momplot{u}{350}{0}
+\momplot{u}{350}{1}
+\momplot{u}{350}{2}
+\momplot{u}{700}{0}
+\momplot{u}{700}{1}
+\momplot{u}{700}{2}
+
+\newpage
+
+\momplot{v}{0}{0}
+\momplot{v}{0}{1}
+\momplot{v}{0}{2}
+\momplot{v}{350}{0}
+\momplot{v}{350}{1}
+\momplot{v}{350}{2}
+\momplot{v}{700}{0}
+\momplot{v}{700}{1}
+\momplot{v}{700}{2}
+
+\newpage
+
+\momplot{h}{0}{0}
+\momplot{h}{0}{1}
+\momplot{h}{0}{2}
+\momplot{h}{350}{0}
+\momplot{h}{350}{1}
+\momplot{h}{350}{2}
+\momplot{h}{700}{0}
+\momplot{h}{700}{1}
+\momplot{h}{700}{2}
+
+\newpage
+
+\momplot{PV}{0}{0}
+\momplot{PV}{0}{1}
+\momplot{PV}{0}{2}
+\momplot{PV}{350}{0}
+\momplot{PV}{350}{1}
+\momplot{PV}{350}{2}
+\momplot{PV}{700}{0}
+\momplot{PV}{700}{1}
+\momplot{PV}{700}{2}
+
+\section{Reynolds Decomposition}
+
+We can take an alternative approach and split quantities into a time-averaged part and variations from the time average:
+\eqnn{
+	\psi(\B{x},t) = \EXP{\psi}(\B{x}) + \tl{\psi}(\B{x},t)
+}
+where $\EXP{\psi}(\B{x}) : = \frac{1}{T}\int_{0}^{T} \psi(\B{x},t) dt $.\\
+\linebreak
+With this decomposition the equations of motion become:
+
+\algnn{
+	\frac{\tl{\B{u}}_{1}(T) - \tl{\B{u}}_{1}(0)}{T} + \EXP{\B{u}_{1}}\cdot\nabla\EXP{\B{u}_{1}} + \EXP{\tl{\B{u}}_{1}\cdot \nabla \tl{\B{u}}_{1}} + \B{f}\times \EXP{\B{u}_{1}} + g\nabla\EXP{h_{1}} & =  \bs{\tau}\\
+	\PD{\tl{\B{u}}_{1}}{t} + \tl{\B{u}}_{1}\cdot\nabla\tl{\B{u}}_{1} + \B{f}\times\tl{\B{u}}_{1} + g\nabla\tl{h}_{1} & = \B{F}_{1}
+}
+where:
+\eqnn{
+\B{F}_{1} = \frac{\tl{\B{u}}_{1}(T) - \tl{\B{u}}_{1}(0)}{T}  + \EXP{\tl{\B{u}}_{1}\cdot \nabla \tl{\B{u}}_{1}} - \EXP{\B{u}}_{1}\cdot\nabla\tl{\B{u}}_{1} - \tl{\B{u}}_{1}\cdot\nabla\EXP{\B{u}_{1}}
+}
+
+\section{Results}
+
+\momplottav{u}{0}{0}
+\momplottav{u}{0}{1}
+\momplottav{u}{0}{2}
+\momplottav{u}{350}{0}
+\momplottav{u}{350}{1}
+\momplottav{u}{350}{2}
+\momplottav{u}{700}{0}
+\momplottav{u}{700}{1}
+\momplottav{u}{700}{2}
+
+\newpage
+
+\momplottav{v}{0}{0}
+\momplottav{v}{0}{1}
+\momplottav{v}{0}{2}
+\momplottav{v}{350}{0}
+\momplottav{v}{350}{1}
+\momplottav{v}{350}{2}
+\momplottav{v}{700}{0}
+\momplottav{v}{700}{1}
+\momplottav{v}{700}{2}
+
+\newpage
+
+\momplottav{h}{0}{0}
+\momplottav{h}{0}{1}
+\momplottav{h}{0}{2}
+\momplottav{h}{350}{0}
+\momplottav{h}{350}{1}
+\momplottav{h}{350}{2}
+\momplottav{h}{700}{0}
+\momplottav{h}{700}{1}
+\momplottav{h}{700}{2}
+
+\newpage
+
+\momplottav{PV}{0}{0}
+\momplottav{PV}{0}{1}
+\momplottav{PV}{0}{2}
+\momplottav{PV}{350}{0}
+\momplottav{PV}{350}{1}
+\momplottav{PV}{350}{2}
+\momplottav{PV}{700}{0}
+\momplottav{PV}{700}{1}
+\momplottav{PV}{700}{2}
+\end{document}

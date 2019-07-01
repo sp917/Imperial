@@ -1,0 +1,123 @@
+\begin{itemize}
+	\item Derivation of equations of motion.
+	\item Description of solving scheme.
+	\item Model configuration.
+	\item Results of various runs and analysis. 
+\end{itemize}
+
+\begin{itemize}
+	\item Ocean plays important role in climate: gulf stream determines climate of Europe.
+	\item However, mechanism for maintaining of Gulf Stream is poorly understood--large number of degrees of freedom.
+	\item Small-scale eddy effect thought to be responsible for the Gulf Stream.
+	\item In order to correctly represent Gulf Stream in numerical models it is necessary to include these small scale effects.
+	\item However, simulations on this scale are impracticable for climate studies. 
+	\item Therefore it is necessary to develop parameterisations which account for the eddy effects in some sense without resolving them explicitly.
+	\item Previous attempts include Leith, Smagorinsky, Gent-McWilliams. These are usually based on heuristic arguments involving energy. 
+	\item Other methods include parameterisation by dynamic forcing (Berloff), stochastic transport (Holm et al) and Data-Driven methods. These have been shown to be effective in the QG case but it remains to demonstrate their applicability to Primitive Equation Models. 
+\end{itemize}
+
+\begin{itemize}
+	\item Derivation of primitive equations.	
+	\item Description of differences from exact equations and QG, RSW.
+\end{itemize}
+
+\iffalse
+In a general setting, we consider a fluid of three-dimensional velocity field $u$ and density field $\rho$ contained in an arbitrary volume $V$ and acted upon by some external forces per unit volume $F$ and surface forces per unit area $\tau n$.  Then by Newton's Second Law we have the change in total momentum given by:
+\eqnn{
+	\D{}{t} \int_{V} \rho u d^{3}x = \int_{V} F d^{3}x + \int_{\pr V} \tau n dS - \int_{\pr V} \rho u u\cdot n dS
+}
+The final term is the momentum flux through the boundary of $V$. For a rotating fluid in a gravitational field we take $F$ to include the Coriolis force and gravitational force, while $\tau$ accounts for the pressure and viscosity terms.  Explicitly we take $F = -\rho g \hat{k} -\rho f \hat{k}\times u$, where $f = 2\Omega\cos(y)$ is the Coriolis parameter and $\tau_{ij} = -p(x,t)\delta_{ij} + \sigma_{ij}(u)$, where $p$ is pressure and $\sigma_{ij}(u)$ is some tensor accounting for viscosity, to be specified later. Using the divergence theorem to get all terms under a volume integral, and using the fact that the volume of integration is arbitrary, we arrive at the following form of the momentum equation:
+\eqlab{
+	\pr_{t}(\rho u) + \nabla\cdot(\rho u\otimes u) +  \rho f\hat{k}\times u + \rho g \hat{k} = -\nabla p + \nabla\cdot \sigma
+}{momeq}
+Following a similar procedure we may derive the equation of conservation of mass:
+\eqlab{
+	\D{}{t}\int_{V}\rho d^{3}x = - \int_{\pr V} \rho u\cdot n dS\quad  \implies \quad \pr_{t}\rho + \nabla\cdot(\rho u) = 0 
+}{conteq}
+We may then use \cref{eq:conteq} to simplify \cref{eq:momeq} and get:
+\eqlab{
+	\pr_{t} u + u\cdot\nabla u + f\hat{k}\times u + g\hat{k} = -\frac{1}{\rho}\nabla p + \frac{1}{\rho}\nabla\cdot\sigma
+}{veleq}
+We also need a further equation to tell us how to calculate $p$. We can do this via an equation of state $\rho = \rho (p, T, S)$, where $T$ is temperature and S represents other tracers such as salinity or entropy; however, we only consider temperature here so that $\rho = \rho(p,T)$. Temperature evolves according to the tracer advection equation (see GFD lecture notes):
+\eqlab{
+	\pr_{t} (\rho T) + \nabla\cdot(\rho u T) = \nabla\cdot(\kappa\nabla T)
+}{traceq}
+The set of equations we have to solve is then \cref{eq:conteq,eq:veleq,eq:traceq} together with $\rho = \rho(p,T)$. These are the complete fluid equations. \\
+\linebreak
+However, to arrive at the primitive equation approximation, let us non-dimensionalize \cref{eq:veleq,eq:conteq}:
+	\algnn{
+		\eps\lrb{\pr_{t} \B{u} + \B{u}\cdot\nabla \B{u} + w\PD{w}{z}} + f\hat{k}\times \B{u}  & = -\frac{1}{(1+b)}\nabla p + \frac{1}{1+b}\nabla\cdot\sigma \\
+		\eps\al^{2}\lrb{\pr_{t}w + \B{u}\cdot\nabla w + w\PD{w}{z}} &= -\frac{1}{1+b}\PD{p}{z} - \frac{1}{\Fc\eps} \\
+		\pr_{t}b + (1+b)\lrb{\nabla\cdot \B{u} + \PD{w}{z}} + \B{u}\cdot\nabla b + w\PD{b}{z} &= 0 
+	}
+	where $\al = H/L$, $\rho = \rho_{0}(1+b)$.
+We then make the following assumptions:
+\begin{itemize}
+	\item $\al = H/L \ll 1$. The consequence of this is that the vertical velocity equation satisfies, to leading order, the hydrostatic balance equation $\PD{p}{z} = -\rho g$. 
+	\item The variations in density are small, $\rho(x,t) = \rho_{0}\lrb{1 + b(x,t)}$ with $b\ll 1$. 
+	\item The flow is divergence-free $\nabla\cdot u = 0$. \footnote{\url{https://ocw.mit.edu/courses/earth-atmospheric-and-planetary-sciences/12-950-atmospheric-and-oceanic-modeling-spring-2004/lecture-notes/lec20.pdf}}. That is, we ignore the terms involving $b$ in the continuity equation. 
+\end{itemize}
+With these assumptions \cref{eq:veleq} becomes:
+\eqlab{
+	\pr_{t}\B{u} + \B{u}\cdot\nabla\B{u} + w\PD{\B{u}}{z} + f\hat{k}\times\B{u} = - \frac{1}{\rho_{0}} \nabla p' + \frac{1}{\rho_{0}}\nabla\cdot \sigma
+}{horizveleq}
+\eqlab{
+	p'(\B{x},z,t) = \rho_{0}g\eta + g\int_{z}^{\eta}\rho'(\B{x},z',t)dz'
+}{pressureq}
+where $p = p_{0} + p'$ and $p_{0}$ is defined by $\PD{p_{0}}{z} = -\rho_{0}g$ and $\left. p_{0}\right|_{z=0} = 0$. $\eta$ is the surface height of the fluid\\
+\linebreak
+Moreover, the divergence-free assumption means that the continuity equation is replaced with:
+\eqlab{
+	\nabla\cdot\B{u} + \PD{w}{z} = 0
+}{diveq}
+Furthermore, if we integrate the above equation in the vertical direction between the bottom topography $-H$ and the sea-surface height $\eta$ then we find:
+\eqlab{
+	\pr_{t}\eta + \nabla\cdot \int_{-H}^{\eta}\B{u}dz = 0
+}{ssheq}
+Finally, the tracer equation becomes:
+\eqlab{
+	\pr_{t}T + \nabla\cdot(\B{u}T) + \PD{(wT)}{z} = \frac{1}{\rho_{0}}\nabla\cdot(\kappa\nabla T)
+}{traceqnew}
+The primitive equations are \cref{eq:horizveleq,eq:pressureq,eq:diveq,eq:ssheq,eq:traceqnew} along with the equation of state $\rho' = \rho'(p',T)$. 
+
+\subsection{Derivation from a variational principle}
+
+We may also derive the primitive equations from a variational principle by considering the following action (reference Holm):
+\eqnn{
+	S = \int_{0}^{T}l(\B{u},w,D,b)dt = \int \lrc{\frac{\eps}{2}D u\cdot\Lambda u + D u \cdot R - Dbz - p(D-1)}d^{2}x dz dt
+}
+where $\Lambda = \diag(1,1,\eps^{2}\al^{2})$; $b = g\rho/\rho_{0}$. $u$ is the three-dimensional velocity and $D,b$ are advected  which we assume to satisfy the advection equation:
+\eqnn{
+	\pr_{t}D + \L_{u}D = 0 \qquad \pr_{t}b + \L_{u}b = 0  
+}
+The lagrangian $l$ satisfies the Euler-Poincar\'{e} equation:
+\eqnn{
+	\pr_{t}\lrb{\dD{l}{u}} + \L_{u}\lrb{\dD{l}{u}} = \dD{l}{D}\diamond D + \dD{l}{b}\diamond b
+}
+where the diamond is defined by $\EXP{p\diamond q, v} = -\EXP{p,\L_{v}q}$. Using the advection equations we can re-write the above as:
+\eqnn{
+	\pr_{t}\lrb{\frac{1}{D}\dD{l}{u}} + \L_{u}\lrb{\frac{1}{D}\dD{l}{u}} = \frac{1}{D}\lrb{\dD{l}{D}\diamond D +\dD{l}{b}\diamond b}
+}
+Substituting in the appropriate expressions then gives:
+\eqnn{
+	\pr_{t}\lrb{\frac{1}{D}\dD{l}{u}} + u\cdot\nabla\lrb{\frac{1}{D}\dD{l}{u}} + \nabla u \cdot \lrb{\frac{1}{D}\dD{l}{u}} = \nabla\lrb{\dD{l}{D}} - \frac{1}{D}\dD{l}{b}\nabla b
+}
+we may then use:
+\algnn{
+	\frac{1}{D}\dD{l}{u} &= \eps \Lambda u + R \\
+	 \dD{l}{D} &= \frac{\eps}{2} u\cdot\Lambda u + u \cdot R - bz - p \\
+	 \frac{1}{D}\dD{l}{b} & = -z 
+}
+Inserting these values, we find:
+\algnn{
+	\eps\lrb{\pr_{t}\B{u} + \B{u}\cdot\nabla\B{u} + w\PD{\B{u}}{z}} + fe_{3}\times\B{u} &= -\nabla p \\
+	\eps^{3}\al^{2}\lrb{\pr_{t}w + \B{u}\cdot\nabla w + w\PD{w}{z}} = -\PD{p}{z} - b
+}
+We also have the auxiliary equations given by advection. These, combined with the Lagrange multiplier equation $D=1$ give:
+\algnn{
+	\nabla\cdot\B{u} + \PD{w}{z} &= 0 \\
+	\pr_{t}b + \B{u}\cdot\nabla b + w\PD{b}{z} &= 0
+}
+Now, to derive the primitive equations we take the limit $\al\arr 0$. 
+\fi
+

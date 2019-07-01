@@ -1,0 +1,258 @@
+\documentclass[10pt]{article}
+
+\input{../Preamble}
+
+\begin{document}
+\title{FESOM2}
+\date{}
+\maketitle
+\section{Derivation of model (Danilov et al 2016)}
+In what follows bold font will be used to indicate two-dimensional vectors; ordinary font may be used for vectors of three dimensions, or scalars.\\
+A fluid is moving inside a domain $\M(t)$, divided into $N$ discrete and disjoint regions $V_{k}(t)$ which evolve with time:
+\eqnn{
+	\M(t) = \bigcup_{k=1}^{N} V_{k}(t)
+} 
+Each region $V_{k}$ consists of a vertically-oriented triangular prism, for which the top and bottom triangle may change in time in both height and orientation. \\
+Consider the fluid contained within one of these regions. The fluid obeys Newton's second law
+\algnn{
+	&\D{}{t} \int_{V_{k}(t)} \rho(x,t) u(x,t) d^{3}x + \int_{\pr V_{k}(t)} \rho(x,t)u(x,t) (u(x,t) - v(x,t))\cdot n dS \\
+	&\qquad  = -\int_{V_{k}(t)} \lrsq{\rho(x,t)g e_{3} + \rho f e_{3}\times u(x,t) }d^{3}x   - \int_{\pr V_{k}(t)} p(x,t) n dS
+}
+	where $\rho$ is the fluid density, $u = (\B{u},w)$ the three dimensional velocity and $v = (0,0,\hat{w})$ the velocity of the mesh. Now let us split the integral into its horizontal and vertical components, and denote with an over-bar the height-average of a quantity: $\bar{\cdot} = \frac{1}{h} \int_{z_{-}}^{z_{+}} \cdot$, where $z_{\pm}(\B{x})$ are the top and bottom heights of the prism. This results in the following:
+	\algnn{
+	&\D{}{t} \int_{A} h \ol{\rho u} dS + \int_{\pr A} h \ol{\rho u  \B{u}}\cdot n dS + \lrb{\int_{A_{+}} - \int_{A_{-}}} \rho u \tl{w} dS  \\
+	& \qquad  = -\int_{A}h\ol{ \lrsq{\rho g e_{3} + \rho f e_{3}\times u} }dS - \int_{\pr A} h\ol{p} n dS - \lrb{\int_{A_{+}} - \int_{A_{-}}} p n dS
+}
+where $A_{\pm}$ are the end (triangular) faces of the prism, and $\tl{w} = (u -v)\cdot n$ with $n$ the normal to $A_{\pm}$. Effectively $\tl{w}$ is the flux across the ends of the prism. $A$ is the horizontal area of the prism; that is, the area of $A_{\pm}$ when they lie flat.  \\
+\linebreak
+Note that, for example:
+\eqnn{
+	\int_{A_{+}} p n dS = \int_{A} p(x,y,z_{+}(x,y)) (-\nabla z_{+} , 1) dx dy
+	}
+We now make the Boussinesq and hydrostatic approximations (see for example, Vallis page 71):
+\algn{
+	\rho & = \rho_{0} + \rho'(x,y,z,t), \quad \rho'\ll \rho_{0} \\ 
+	p & = p_{0}(z) + p'(x,y,z,t)	\\
+	 \PD{p}{z} & = - \rho g \label{eq:hydrostatic}
+}
+where $p_{0}$ is defined such that $\PD{p_{0}}{z} = -\rho_{0}g$ and with boundary condition $p_{0}(0) = 0$. Then $p_{0}(z) = -g\rho_{0}z$. From this we may deduce (taking atmospheric pressure to be zero) that:
+\eqnn{
+	p'(x,y,z,t) = g\rho_{0}H(x,y) + g\int_{z}^{H(x,y)}\rho'(z')dz' \approx   g\rho_{0}H(x,y) + g\int_{z}^{0}\rho'(z')dz'
+}
+Furthermore, \cref{eq:hydrostatic} can be integrated to show that:
+\eqnn{
+	 \lrb{\int_{A_{+}} - \int_{A_{-}}} p n dS = g\int_{A}\lrb{(-\nabla z_{+}, 1)\int_{z_{+}(x,y)}^{H(x,y)} \rho(z')dz' - (-\nabla z_{-}, 1)\int_{z_{-}(x,y)}^{H(x,y)} \rho(z')dz' }dS
+}
+where $H(x,y)$ is the height of the upper surface of the fluid, and we take $p(x,y,H) = 0$. The z-component of the above equation is equal to $-g\int_{A} h\ol{\rho} dS$.\\
+ Then the horizontal component of our equation of motion becomes:
+	\algnn{
+	&\D{}{t} \int_{A} h \ol{ \B{u}} dS + \oint_{\pr A} h \ol{ \B{u}  \B{u}}\cdot \B{n} dl + \int_{A} \lrsq{ (\B{u} \tl{w})_{+}\sqrt{1 + \abs{\nabla z_{+}}^{2}} - (\B{u} \tl{w})_{-}\sqrt{1 + \abs{\nabla z_{-}}^{2}} } dS  \\
+	& \qquad  = -\int_{A}h f e_{3}\times \ol{\B{u}} dS - \frac{1}{\rho_{0}}\oint_{\pr A} h\ol{p} \B{n} dl + \frac{1}{\rho_{0}}\int_{A} \lrsq{p_{+}\nabla z_{+} - p_{-}\nabla z_{-}}  dS
+}
+where $p_{\pm} : = p(x,y,z_{\pm},t)$. It may be shown that if we expand $p = p_{0} + p'$ then the terms with $p_{0}$ cancel out and so we can replace $p$ in the above with $p'$. We can also write, as an alternative:
+\eqnn{
+	(\B{u} \tl{w})_{+}\sqrt{1 + \abs{\nabla z_{+}}^{2}} =  \B{u}_{+}\lrb{-\B{u}_{+}\cdot \nabla z_{+} + (w_{+}-\hat{w}_{+})} =: \B{u}_{+} \phi_{+}
+	}
+	and similarly with $\B{u}_{-}$. Moreover, we observe that:
+\eqnn{
+	\oint_{\pr A} h\ol{p'}\B{n} dl = \int_{A} \nabla \lrb{\int_{z_{-}}^{z_{+}} p' dz} dS = \int_{A} \lrb{p'_{+}\nabla z_{+} - p'_{-}\nabla z_{-} + \int_{z_{-}}^{z_{+}}\nabla p dz}
+}
+	Then the overall equation becomes:
+	\algnn{
+	&\D{}{t} \int_{A} h \ol{ \B{u}} dS + \oint_{\pr A} h \ol{ \B{u}  \B{u}}\cdot \B{n} dl + \int_{A} \lrsq{ \B{u}_{+} \phi_{+} - \B{u}_{-}\phi_{-} } dS  \\
+	& \qquad  = -\int_{A}h f e_{3}\times \ol{\B{u}} dS -  \frac{1}{\rho_{0}}\int_{A} h \ol{\nabla p'} dS
+}
+Now, to obtain equation (6) from Danilov et al (2016) we follow the procedure of Ringler et al (2013), dividing by the area $|A|$ and taking the small-$A$ limit, which is:
+\algn{
+	&\PD{}{t}  \lrb{h \ol{ \B{u}}} + \nabla\cdot\lrb{ h \ol{ \B{u}  \B{u}}} +  \B{u}_{+}\phi_{+} - \B{u}_{-}\phi_{-}   = - h f e_{3}\times \ol{\B{u}}  - \frac{1}{\rho_{0}}h\ol{\nabla p'} \label{eq:infinitessimalmomeq}
+}
+
+To obtain the alternative form of the momentum equation, we consider the continuity equation. Conservation of mass gives:
+\eqnn{
+	\D{}{t} \int_{V_{k}(t)} \rho d^{3}x + \int_{\pr V_{k}(t)} \rho u\cdot n dS = 0
+}
+As before we split $V_{k}(t)$ into its vertical and horizontal components:
+\eqnn{
+	\D{}{t} \int_{A} h\ol{\rho} dS + \int_{\pr A} h \ol{ \rho \B{u}}\cdot n dS + \int_{A}\lrsq{\rho_{+}\phi_{+} - \rho_{-}\phi_{-}}dS = 0
+}
+We apply the Boussinesq approximation:
+\eqnn{
+	\D{}{t} \int_{A} h dS + \int_{\pr A} h \ol{ \B{u}}\cdot n dS + \int_{A}\lrsq{\phi_{+} - \phi_{-}}dS = 0
+}
+Then, taking the small-$A$ limit:
+\eqnn{
+	\PD{h}{t} + \nabla\cdot\lrb{ h \ol{ \B{u}}} + \lrsq{\phi_{+} - \phi_{-}} = 0
+}
+Now if we take \cref{eq:infinitessimalmomeq} and ignore the averaging overbars, then we can combine it with the continuity equation to obtain:
+\algnn{
+	&\PD{\B{u}}{t}  + \B{u}\cdot\nabla\B{u} +  \Half\lrsq{(\phi \pr_{z}\B{u})_{+} + (\phi\pr_{z}\b{u})_{-}}   \nonumber\\
+	& \qquad \qquad  = - f e_{3}\times \B{u}  - \frac{1}{h\rho_{0}}\nabla \lrb{ h p}+ \frac{1}{h\rho_{0}} \lrsq{p_{+}\nabla z_{+} - p_{-}\nabla z_{-}}  
+}
+Where we have  defined $(\pr_{z}\B{u})_{+} : = \frac{2}{h}\lrsq{\B{u}_{+} - \B{u}}$ and $(\pr_{z}\B{u})_{-} : = \frac{2}{h}\lrsq{\B{u} - \B{u}_{-}}$.
+
+\section{Discretisation}
+Here we attempt to discretise \cref{eq:integralmomeq}. First define:
+\eqnn{
+	\B{U}_{k}(t) : = \frac{1}{\abs{A}}\int_{A} h\ol{\B{u}} dS
+}
+We think of $\B{U}_{k}(t)$ as the momentum at the centre of the cell $V_{k}(t)$. Further, define $\B{u}^{k}: = \B{U}_{k}/h_{k}$, where $h_{k}$ will be defined later. Then set:
+\algnn{
+	 \frac{1}{\abs{A}}\int_{\pr A} h \ol{ \B{u}  \B{u}}\cdot \B{n} dS  & \approx \frac{1}{\abs{A}}\sum_{e(k)} l_{e} \B{u}_{e}\B{U}_{e}\cdot \b{n}_{e} \\
+	 																							& = \frac{1}{\abs{ A}}\sum_{e(k)} l_{e} \lrb{\Half\sum_{v(e)} \B{u}_{v}}\lrb{\Half\sum_{v(e)}\B{U}_{v}} \cdot \B{n}_{e} \\
+	 																							& = \frac{1}{\abs{A}}\sum_{e(k)} l_{e} \lrb{\Half\sum_{v(e)}\frac{1}{3A_{v}} \lrb{\sum_{c(v)} \B{u}_{c}A_{c}}}\lrb{\Half\sum_{v(e)}\frac{1}{3 A_{v}}\lrb{\sum_{c(v)}\B{U}_{c}A_{c}}}  \cdot \B{n}_{e} \\
+	 																							& =: \lrsq{\nabla\cdot (\B{U}\B{u})}_{k}(t)
+}
+Additionally, we approximate:
+ \eqnn{
+ 	\frac{1}{\abs{A}}\int_{A} \lrb{\B{u}_{+} \phi_{+} - \B{u}_{-} \phi_{-} }dS  \approx \lrb{\B{u}^{k}_{+} \phi_{+}^{k} - \B{u}^{k}_{-} \phi_{-}^{k}}
+ 	}
+ 	And:
+ 	\eqnn{
+ 		\frac{1}{\abs{A}}\int_{A}h f e_{3}\times \ol{\B{u}} dS  \approx f e_{3}\times \B{U}_{k}
+ 		}
+ 		Moreover:
+ 		\algnn{
+ 			\frac{1}{\abs{A}} \int_{\pr A} h \ol{p}\B{n} dS  & \approx \frac{1}{\abs{A}} \sum_{e(k)}l_{e} (hp)_{e}\B{n}_{e}  \\
+ 																										 &  =  \frac{1}{\abs{A}} \sum_{e(k)}l_{e} \lrb{\Half\sum_{v(e)}p_{v}h_{v}}\B{n}_{e}  \\
+ 																										 &  =: \lrsq{\nabla(hp)}_{k}
+ 		}
+ 		Finally, setting:
+ 		\algnn{
+ 			\frac{1}{\abs{A}}\lrsq{p_{+}\nabla z_{+} - p_{-}\nabla z_{-}} & \approx p_{+}\nabla z_{+} - p_{-}\nabla z_{-} 
+ 				}
+ 			Overall, we have:
+ 			\algn{
+ 				& \D{\B{U}_{k}}{t} + \lrsq{\nabla\cdot(\B{U}\B{u})}_{k} + \B{u}^{k}_{+} \phi_{+}^{k} - \B{u}^{k}_{-} \phi_{-}^{k} + f e_{3}\times \B{U}_{k} = -\frac{1}{\rho_{0}}\lrsq{\nabla(hp)}_{k} + \frac{1}{\rho_{0}}\lrsq{p_{+}^{k}\nabla z_{+}^{k} - p_{-}^{k}\nabla z_{-}^{k}} \label{eq:discretemomeq}
+ 			}
+ 			Now, if we formally expand the right-hand side we obtain:
+ 			\algnn{
+ 				-(\nabla h)p - h\nabla p + p_{+}\nabla z_{+} - p_{-}\nabla z_{-} & = 
+ 			}
+ 			And the continuity equation is obtained by the following designations:
+ 			\algnn{
+ 					\frac{1}{\abs{A}}\int_{A} h dS  & =: h_{k}  \\
+ 					\frac{1}{\abs{A}} \int_{\pr A} h\ol{\B{u}}\cdot \B{n} dS  & \approx \sum_{e(k)} l_{e} \B{U}_{e}\cdot \B{n}_{e} \\ 
+ 																								& = \sum_{e(k)} l_{e} \lrb{\Half\sum_{v(e)}\frac{1}{3 A_{v}}\lrb{\sum_{c(v)}\B{U}_{c}A_{c}}}  \cdot \B{n}_{e} \\
+ 																								& =: \lrsq{\nabla \cdot\lrb{h\B{u}}}_{k} \\
+ 					\frac{1}{A} \int_{A}\lrsq{\phi_{+} - \phi_{-}}dS & \approx \phi_{+}^{k} - \phi_{-}^{k}
+ 			}
+ 			Combining these gives:
+ 			\eqlab{
+ 				\D{h_{k}}{t} + \lrsq{\nabla \cdot\lrb{h\B{u}}}_{k} + \phi_{+}^{k} - \phi_{-}^{k} = 0
+ 			}{discreteconteq}
+ 			Summing \cref{eq:discreteconteq} over vertical layers gives:
+ 			\eqlab{
+ 				\D{\eta}{t} + \sum_{k}\lrsq{\nabla \cdot\lrb{h\B{u}}}_{k} +\phi_{\text{top}} = 0
+ 			}{totalconteq}
+ 			where $\eta$ is the total height of the fluid layer and $\phi_{top}$ the flux through the fluid surface.
+ 			
+ 			\section{Time Stepping}
+ 			In Danilov et al (2016) they use the following evolution equation for $\B{u}$ (need more detail on how to obtain this):
+ 			\algnn{
+ 				& \pr_{t}\B{u} + \frac{\omega + f}{h} e_{3}\times \B{u}h + \Half\lrsq{\lrb{w\pr_{z}\B{u}}_{+} - \lrb{w\pr_{z}\B{u}}_{-}} + \nabla\lrb{p/\rho_{0} + \Half\abs{\B{u}}^{2}} + g\rho\nabla Z/\rho_{0}  = D_{u}(\B{u}) + \pr_{z}\lrb{\nu_{\text{v}}\pr_{z}\B{u}}
+ 			}
+ 			with
+ 			\eqnn{
+ 				p = g \rho_{0} \eta + g\int_{z}^{0} \rho(z') dz'
+ 			}
+ 			Thus we may write the evolution equation as:
+ 			\eqnn{
+ 				\pr_{t}\B{u} = \B{R}_{u} + \pr_{z}\lrb{\nu_{\text{v}}\B{u}} - g\nabla\eta
+ 			}
+ 			where
+ 			\eqnn{
+ 				\B{R}_{u} : = D_{u}(\B{u})  - \lrb{ \frac{\omega + f}{h} e_{3}\times \B{u}h + \Half\lrsq{\lrb{w\pr_{z}\B{u}}_{+} - \lrb{w\pr_{z}\B{u}}_{-}} + \nabla\lrb{p_{h}/\rho_{0} + \Half\abs{\B{u}}^{2}} + g\rho\nabla Z/\rho_{0}}
+ 			}
+ 			and $p_{h} = g\int_{z}^{0} \rho(z') dz'$.\\
+ 			\linebreak
+ 			In summary we need to solve:
+ 			\algnn{
+ 				&\pr_{t}\B{u}_{k}  = \B{R}_{u,k} + \pr_{z}\lrb{\nu_{\text{v}}\B{u}_{k}} - g\nabla\eta \\
+ 				&\D{h_{k}}{t} + \lrsq{\nabla \cdot\lrb{h\B{u}}}_{k} + \phi_{+}^{k} - \phi_{-}^{k} = 0 \\
+ 				&\D{\eta}{t} + \sum_{k}\lrsq{\nabla \cdot\lrb{h\B{u}}}_{k} +\phi_{\text{top}} = 0
+ 			}
+ 			To do this we discretise using asynchronous time-stepping:
+ 			\eq{
+ 				h^{n+1/2}_{k} - h^{n-1/2}_{k} = - \Delta t\lrsq{\nabla\cdot\lrb{\B{u}^{n}_{k}h^{n-1/2}_{k}} + \phi_{+}^{k} - \phi_{-}^{k}}
+ 			}
+ 			then with $h$ defined in this way, let:
+ 			\eqnn{
+ 				\bar{h} : = \sum_{k}h_{k} - H
+ 			}
+ 			$\eta$ and $\bar{h}$ should be the same, but they differ because of the temporal discretisation used. Therefore we need a scheme in which they do not diverge too much. \\
+ 			\linebreak
+ 			$\eta$ evolves according to:
+ 			\eqnn{
+ 				\eta^{n+1} - \eta^{n} = -\Delta t\lrsq{ \al\lrb{\nabla\cdot \int^{\bar{h}^{n+1/2}}\B{u}^{n+1}dz + \phi^{n+1/2}_{\text{top}}} + (1-\al)\lrb{\nabla\cdot \int^{\bar{h}^{n - 1/2}}\B{u}^{n}dz + \phi_{\text{top}}^{n-1/2}} } 
+ 			}
+ 			where $\al$ is an implicitness parameter and the integral is really a sum vertically over layers.\\
+ 			\linebreak
+ 			On the other hand, $\bar{h}$ evolves according to:
+ 			\eqnn{
+ 				\bar{h}^{n+1/2} - \bar{h}^{n-1/2} = -\Delta t \lrsq{\nabla\cdot \int^{\bar{h}^{n-1/2}}\B{u}^{n}dz - \phi_{\text{top}}^{n-1/2}}	
+ 			}
+ 			The evolution equations for $\bar{h}$ and $\eta$ are therefore consistent if we require:
+ 			\eqnn{
+ 				\eta^{n} = \al \bar{h}^{n+1/2} + (1-\al)\bar{h}^{n-1/2}
+ 			}
+ 			To discretise the momentum equation we write:
+ 			\eqnn{
+ 				\B{u}^{n+1}_{k} - \B{u}^{n+1}_{k} = \Delta t \lrsq{\B{R}_{u,k}^{n+1/2} + \pr_{z}\nu_{v}\pr_{z}\B{u}^{n+1}_{k} - g\nabla\lrb{\theta \eta^{n+1} + (1-\theta)\eta^{n}}}
+ 			}
+ 			and we use the Adams-Bashforth method to calculate $\B{R}_{u,k}^{n+1/2}$. However, we split this into two steps using a predictor-corrector method:
+ 			\algnn{
+ 				\B{u}^{*}_{k} - \B{u}^{n}_{k} & = \Delta t\lrsq{\pr_{z}\nu_{v}\pr_{z}\lrb{\B{u}^{*}_{k} - \B{u}^{*}_{k}} + \B{R}_{u,k}^{n+1/2} + \pr_{z}\nu_{v}\pr_{z}\B{u}^{n}_{k} - g\nabla\eta^{n}} \\
+ 				\B{u}^{n+1}_{k} - \B{u}^{*}_{k} & = -g\Delta t \theta \nabla\lrb{\eta^{n+1} - \eta^{n}}
+ 			}
+ 			So if, after the first step we define $\Delta \B{u} : = \b{u}^{*} - \B{u}^{n}$, then the $\eta$ equation becomes:
+ 			\algnn{
+ 				\eta^{n+1} - \eta^{n} & - \al\theta g \Delta t^{2} \nabla\cdot \int^{\bar{h}^{n+1/2}}\nabla\lrb{\eta^{n+1} - \eta^{n}}dz \\ 
+ 					& = -\Delta t \al\lrb{\nabla\cdot\int^{\bar{h}^{n+1/2}}(\B{u}^{n} + \Delta \B{u})dz + \phi^{n+1/2}_{\text{top}}} - \Delta t(1-\al)\lrb{\nabla\cdot \int^{\bar{h}^{n-1/2}}\B{u}^{n}dz + \phi^{n-1/2}_{\text{top}}}
+ 			}
+ 			Overall, then, the strategy is as follows:
+ 			\begin{itemize}
+ 				\item $\eta^{n} = \al \bar{h}^{n+1/2} + (1-\al)\bar{h}^{n-1/2}$.
+ 				\item Calculate $\Delta \B{u}$ from $\B{u}^{*}_{k} - \B{u}^{n}_{k}  = \Delta t\lrsq{\pr_{z}\lrb{\nu_{v}\pr_{z}\lrb{\B{u}^{*}_{k} - \B{u}^{n}_{k}}} + \B{R}_{u,k}^{n+1/2} + \pr_{z}\nu_{v}\pr_{z}\B{u}^{n}_{k} - g\nabla\eta^{n}}$.
+ 				\item Evolve $\eta$ by:
+ 					\algnn{
+ 				\eta^{n+1} - \eta^{n} & - \al\theta g \Delta t^{2} \nabla\cdot \int^{\bar{h}^{n+1/2}}\nabla\lrb{\eta^{n+1} - \eta^{n}}dz \\ 
+ 					& = -\Delta t \al\lrb{\nabla\cdot\int^{\bar{h}^{n+1/2}}(\B{u}^{n} + \Delta \B{u})dz + \phi^{n+1/2}_{\text{top}}} - \Delta t(1-\al)\lrb{\nabla\cdot \int^{\bar{h}^{n-1/2}}\B{u}^{n}dz + \phi^{n-1/2}_{\text{top}}}
+ 			}
+ 			\item Get the new horizontal velocity from:
+ 				\eqnn{
+ 					\B{u}^{n+1}_{k} - \B{u}^{*}_{k} = -g\Delta t \theta \nabla\lrb{\eta^{n+1} - \eta^{n}}
+ 				}
+ 				\item Evolve $\bar{h}$ according to:
+ 						\eqnn{
+ 				\bar{h}^{n+3/2} - \bar{h}^{n+1/2} = -\Delta t \lrsq{\nabla\cdot \int^{\bar{h}^{n+1/2}}\B{u}^{n+1}dz - \phi_{\text{top}}^{n+1/2}}	
+ 			}
+ 			\item Determine new layer thicknesses. We do this by distributing the total change in height over all eligible layers:
+ 						\eqnn{
+ 							\pr_{t} h_{k} = \lrb{h^{0}_{k}/\tl{H}} \pr_{t}\bar{h}
+ 						} 
+ 						where $\tl{H}$ is the unperturbed height of the eligible layers and $h^{0}_{k}$ are arbitrary heights which sum to $\tl{H}$.
+ 			\item We may then calculate:
+ 				\eqnn{
+ 					(\phi^{k}_{+})^{n+3/2} -( \phi^{k}_{-} )^{n+3/2}= - \frac{h_{k}^{n+3/2} - h_{k}^{n+1/2}}{\Delta t} - \nabla\cdot\lrb{\B{u}^{n+1}_{k}h^{n+1/2}_{k}} 
+ 				}
+ 				to get the fluxes $\phi_{\pm}$, using the fact that at the bottom layer the flux $\phi_{\text{bottom}} = 0$.
+ 				\item Finally, we advance the tracers. The tracer equation is written as:
+ 					\eqnn{
+ 						\pr_{t}(hT)_{k} + \nabla\cdot(\B{u}hT)_{k} + \lrb{\phi_{+}T_{+} - \phi_{+}T_{+}}_{k}  = \nabla_{3}\cdot\lrb{K\nabla_{3}T_{k}}
+ 					}
+ 					where $K$ is the diffusion tensor, a $3\times 3$ matrix. We can also write the above equation as:
+ 					\eqnn{
+ 						\pr_{t}(hT)_{k}  =R_{T} +  \pr_{z}\lrb{h K_{33}\pr_{z}T_{k}}
+ 					}		
+ 					which we discretise as:
+ 					\eqnn{
+ 						h^{n+1/2}_{k}T^{n+1/2}_{k} - h^{n-1/2}_{k}T^{n-1/2}_{k}  = \Delta t\lrsq{R_{T}^{n} + \lrb{K_{33}\pr_{z}T_{k}}^{+} - \lrb{K_{33}\pr_{z}T_{k}}^{-}}
+ 					}
+ 					and split into two steps:
+ 					\algnn{
+ 						h^{n+1/2}_{k}T^{*}_{k} - h^{n-1/2}_{k}T^{n-1/2}_{k}  &= \Delta t R_{T}^{n} \\
+ 						h^{n+1/2}_{k}\lrb{T^{n+1/2}_{k} - T^{*}_{k}}  &= \Delta t\lrsq{ K_{33}\pr_{z}(T_{k}^{n+1/2}-T^{*}_{k}) + K_{33}\pr_{z}T^{*}}_{-}^{+}
+ 					}
+ 			\end{itemize}
+ 			
+\end{document}

@@ -1,0 +1,80 @@
+\documentclass[10pt]{article}
+
+\input{../Preamble}
+
+\begin{document}
+\title{The Primitive Equations of Fluid Dynamics}
+\date{}
+\maketitle
+
+\section{Physical Derivation}
+
+The full compressible rotating Euler equations are:
+
+\algnn{
+	\pr_{t} \B{u} + \B{u}\cdot\nabla\B{u} + 2\B{\Omega}\times \B{u} & = -\frac{1}{\rho}\nabla p - g\B{e}_{3} \\
+	\pr_{t}\rho + \nabla\cdot (\rho\b{u}) & = 0 
+}
+To derive the primitive equations we non-dimensionalise as follows:
+\algnn{
+	\B{u} \arr (U\B{u}_{2}, Ww) \qquad t \arr (L/U)t \qquad \B{\Omega} \arr f_{0}\B{\Omega} \qquad \rho \arr \rho_{0}\rho \qquad p\arr g\rho_{0}H p
+}
+So that in what follows $\B{u}_{2}$ will be the two-dimensional velocity. Thus:
+\algnn{
+	\eps \lrb{\pr_{t} \B{u}_{2} + \B{u}\cdot\nabla\B{u}_{2}}+  2\B{\Omega}\times \B{u}_{2} & = -\frac{1}{\Fc \eps}\frac{1}{\rho}\nabla_{2} p \\
+	\eps (Wf_{0}/g)(\pr_{t}w + \B{u}\cdot\nabla w)   & = - \frac{1}{\rho}\PD{p}{z}  - 1\\
+	\pr_{t}\rho + \nabla\cdot (\rho\b{u}) & = 0 
+}
+where $\eps : = \frac{U}{f_{0}L}$ and $\Fc^{-1}: = \frac{gH}{f_{0}^{2}L^{2}}$.\\
+Let us make the following assumptions:
+\eqnn{
+	\rho = 1 + \eps \rho' \qquad Wf_{0}/g =\O(\eps) 
+}
+\section{Variational Derivation}
+
+The Lagrangian for the incompressible rotating Euler equations is:
+
+\eqnn{
+	l(\b{u},D) : = \int\lrc{ \Half D \abs{\B{u}}^{2} + D\B{u}\cdot \B{R} -D gz - p(D-1)} d^{n}x 
+}
+And this obeys the Euler-Poincar\'{e} equation:
+
+\eqnn{
+	\lrb{\PD{}{t} + \L_{u}}\lrb{\dD{l}{\B{u}} \cdot d\B{x}\otimes d^{n}x } = \dD{l}{D}\diamond D
+}
+along with the auxiliary equation for the advected quantity $D$:
+\eqnn{
+	\lrb{\PD{}{t} + \L_{u}}(D d^{n} x) = 0
+}
+and the equation from the Lagrange multiplier $p$:
+\eqnn{
+	D = 1
+}
+We can therefore combine these to get:
+\eqnn{
+	\lrb{\PD{}{t} + \L_{u}}\lrb{\frac{1}{D}\dD{l}{\B{u}} \cdot d\B{x}} = \frac{1}{D}\dD{l}{D}\diamond D
+}
+where, with slight abuse of notation, we take the one-form version of the right-hand side. Explicitly:
+\eqnn{
+	\B{m} : = \frac{1}{D}\dD{l}{\B{u}} = \B{u} + \B{R} \qquad  \frac{1}{D}\dD{l}{D} =  \Half  \abs{\B{u}}^{2} + \B{u}\cdot \B{R} - gz - p
+}
+and:
+\eqnn{
+	\L_{u} (\B{m}\cdot d\B{x}) = \lrb{\B{u}\cdot\nabla\B{m} + \nabla \B{u}\cdot \B{m}}\cdot d\B{x}
+}
+\eqnn{
+	\frac{1}{D}\dD{l}{D}\diamond D = \nabla\lrb{\dD{l}{D}}\cdot d\B{x}
+}
+Overall, then:
+\eqnn{
+	\PD{}{t}\B{u} + \B{u}\cdot\nabla\B{u} + \nabla \B{u}\cdot \B{u} +  \B{u}\cdot\nabla\B{R} + \nabla \B{u}\cdot \B{R}  = \nabla\lrb{\Half  \abs{\B{u}}^{2} + \B{u}\cdot \B{R} -gz - p}
+}
+applying the fundamental vector identity of fluid dynamics, we find overall:
+\eqnn{
+	\PD{}{t}\B{u} + \B{u}\cdot\nabla\B{u} +  2\B{\Omega}\times \B{u}  =  -\nabla p - g\B{e}_{3}
+}
+where $2\B{\Omega} : = \curl{\B{R}}$. And combining the continuity equation with the fact that $D = 1$ gives:
+\eqnn{
+	\nabla \cdot \B{u} = 0
+}
+\end{document}

@@ -1,0 +1,34 @@
+ The MIT global circulation model (MITgcm, see \cite{mit_2018}) is, like FESOM, a global ocean model used widely for oceanographic and climate studies. Unlike FESOM, however, MITgcm solves the primitive equations globally on a `cubed sphere' mesh such that the domain is discretised into rectangular boxes. The aim with MITgcm will be the same as that with FESOM: we shall begin by finding the appropriate model configuration to simulate the gulf stream in the North Atlantic, then use this configuration to implement backscatter parameterisation schemes. Once we have done this for both models we shall compare the perfomance of the two models and the effectiveness of the backscatter schemes in each of them. \\
+ \linebreak
+As far as possible we shall aim to use the same physical set-up as we used for the FESOM simulations. To this end we use the same dimensions of domain as before and the same resolution in terms of node spacing; however since the domain is split into squares instead of triangles there will be fewer cells overall in this model. Moreover, the positioning of variables is different in MITgcm, which uses an Arakawa C grid such that horizontal velocities are defined on the centres of faces between cells in their respective directions, scalar quantities are again at vertices and vertical velocities are located at the centres of the interfaces between cells in the vertical direction:
+ \begin{figure}[H]
+  \centering
+  \includegraphics[width=0.3\linewidth]{cell2.png}
+    \captionsetup{width=.8\linewidth}
+  \caption{\footnotesize One cell in the discretised domain with positions at which each quantity is defined.}
+\end{figure}
+
+\subsection{Time-Stepping}
+
+To solve \cref{eq:primitiveequations}, MITgcm follows a similar procedure to FESOM, by first writing \cref{eq:primeqmomentum} in a simplified form and using the linearised sea-surface height equation:
+\algnn{
+	\pr_{t}\B{u} + g \nabla_{2}\eta &= \B{G} \\
+	\pr_{t}\eta + \nabla\cdot\int_{-H}^{0}\B{u}dz = 0
+}
+Where $\B{G}$ represents the remaining terms. The discretised equations are then:
+\algnn{
+	\B{u}^{n+1} + g \Delta t \nabla_{2}\eta^{n+1} & = \B{u}^{n} + \Delta t \B{G}^{n+1/2} \\
+	\eta^{n+1}  &= \eta^{n} -  \Delta t\nabla\cdot \int_{-H}^{0} \B{u}^{n+1} dz
+}
+The velocity equation is then split into a predictor and corrector step, with the continuity equation solved in between:
+\algnn{
+	\B{u}^{*} &= \B{u}^{n} + \Delta t \B{G}^{n+1/2} \\
+	\eta^{*} &= \eta^{n} - \Delta t \nabla\cdot \int_{-H}^{0}\B{u}^{*} dz \\
+	\nabla\cdot \lrb{gH\nabla\eta^{n+1}} - \frac{\eta^{n+1}}{\Delta t^{2}} & = -\frac{\eta^{*}}{\Delta t^{2}} \\
+	\B{u}^{n+1} &= \B{u} - g\Delta t \nabla\eta^{n+1}
+}	
+As with FESOM, we then calculate the vertical velocity diagnostically, advect the tracers and calculate $\rho$ and $p$ from the equation of state and the hydrostatic balance condition, respectively. 
+
+\subsection{Model Configuration}
+
+As far as possible we shall use the same configuration as that used for FESOM; i.e. with the same parameters and forcings as described in \cref{sec:fesomsetup,sec:fesomparams}. However, due to the different discretisation there may be some differences that arise from a need for numerical stability. In particular it may be necessary to use different values for viscosities and time steps. Moreover, the temperature relaxation used in FESOM may not produce the required jet, and so we may have to use a different forcing. These will be topic for future investigation.  

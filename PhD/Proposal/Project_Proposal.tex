@@ -1,0 +1,45 @@
+\documentclass[10pt]{article}
+\usepackage{fullpage}
+\usepackage{url}
+\usepackage{amsfonts}
+
+\begin{document}
+\title{\vspace{-4.0em}Eddy Parameterizations in Oceanic Primitive Equation Models}
+\date{\vspace{-0.5em}}
+\author{Student: Stuart Patching (Imperial College)\\
+\small{Primary Supervisor: Professor Darryl Holm (Imperial College)}\\
+\small{Co-Supervisors: Dr. Pavel Berloff (Imperial College), Dr. Igor Shevchenko (Imperial College)} \vspace{-2em}}
+\maketitle
+\textbf{ }\\
+The Gulf stream can be thought of as a giant meandering ribbon-like river in the ocean which originates in the Caribbean basin and carries warm water across the Atlantic to the west coast of Europe, keeping the European climate relatively mild. In spite of its significance to weather and climate, the Gulf Stream has remained poorly understood by oceanographers and fluid dynamicists for the past seventy years. This is largely due to the fact that the large-scale flow is significantly affected by multi-scale fluctuations known as mesoscale eddies. It is hypothesized (see \cite{i}) that the mesoscale eddies produce a backscatter effect which is largely responsible for maintaining the eastward jet extensions of the Gulf Stream and other western boundary current. \\
+\linebreak
+There currently exist two main approaches to studying this problem. The first is to consider simplistic quasigeostrophic (QG) models. These models are well-understood theoretically, but lack a lot of important physical processes including ageostophic motion, varying stratification, large deformations of isopycnal surfaces, steep bottom topography and large latitudinal variations of the Coriolis parameter, all of which may have significant impacts on the eddy backscatter in the Gulf Stream. The second approach is to run simulations on more comprehensive primitive equation (PE) models in which eddies may be resolved explicitly. However, the physical processes underlying the eddy backscatter in these models is still poorly understood; moreover, running simulations with primitive equations on a grid scale fine enough to resolve eddy effects is computationally very expensive, meaning that running over time scales relevant to climate variability becomes infeasible. \\
+\linebreak
+The first aim of the project will be to bridge the gap in understanding between the overly simplistic QG models, and the more physically relevant PE models. This will be done primarily by running massively parallel, high-resolution simulations of PE ocean circulation models on the Imperial College high-performance computing cluster, then performing statistical analyses on the resulting data. \\
+\linebreak
+Concretely, we shall focus on the wind-driven double-gyre model, and consider both 'light' models with a few constant-density layers, and 'heavy' models with 30-40 vertical levels.  We shall also make some simplifying assumptions: the equation of state shall be taken to be linear, so that buoyancy is equivalent to temperature; salinity is excluded for simplicity; we shall use a mid-latitude, beta-plane model; and we shall assume an idealized steady atmospheric forcing consistent with observations but without feedback effects from the ocean on the atmosphere. At the northern and southern boundaries we shall prescribe vertical temperature profiles consistent with observations and sponge boundary layers, in order to reproduce effects of the meridional overturning circulation and maintain a realistic pycnocline. The lateral boundary conditions will be no-slip for momentum and insulating for temperature; and the standard bottom drag will be included.
+\\ 
+\linebreak
+Once we have run these simulations we shall analyse the resulting data. The analysis will be done by spatiotemporal filtering to decompose each solution into large-scale and eddy components. The statistical description of the eddy/large-scale interactions will be focused on the eddy forcings (i.e., eddy
+flux divergences) and their correlations with the eastward jet. However, it will not be clear which statistical description of the eddies is most useful until all of the analysis has been completed. \\
+\linebreak
+To gain good theoretical understanding of the physical processes it is useful to carry out potential vorticity (PV) analysis. This provides a framework for unifying the hierarchy of models and may provide insights into the connection between the previously studied QG models and the newer PE models. The analysis will allow us to track water masses on isopycnal surfaces, identify areas of PV production and dissipation, explore how PV gains and losses are distributed in space, and separate the PV circulation in the ocean interior from the PV fluxes at the boundaries. Eddy PV fluxes, which indicate the roles played by eddies in the formation and maintenance of the mean PV fields will be correlated with the eastward jet and then used to estimate the corresponding eddy diffusivity tensors.\\
+\linebreak
+After we have understood the Eddy backscatter mechanism in PE models we would like to parametrize this process in order to run more efficient gulf stream simulations. There are three possible ways in which we propose to do this. \\
+\linebreak
+The first involves introducing stochastic advection into the model as in \cite{ii}. Such an approach would involve representing small-scale eddy effects by stochastic transport noise. The key advantage of this method is that the noise is introduced in such a way as to preserve important features of the governing fluid equations, such as the Kelvin circulation theorem. This method involves firstly running deterministic simulations on a fine grid, which will be used to determine the coefficients of the noise by use of empirical orthogonal functions or other means. Stochastic simulations are then run on a coarse grid and compared with the projection onto the coarse grid of the 'true' (fine-grid) simulations. We may then attempt to use Data Assimilation methods to reduce the variance of the stochastic solution.\\
+\linebreak
+The second method is deterministic roughening as detailed in \cite{i}. The motivation for this method is that eddy backscatter effects can be suppressed by adding a damping term to the governing fluid equations; it is therefore suggested that eddy effects can be introduced by adding instead an undamping (roughening) term. It is then shown in \cite{i} that, within the QG framework, this parameterization successfully reproduces backscatter effects in coarser-resolution ocean simulations. Our aim will be to adapt this method to a primitive equation framework. \\
+\linebreak
+The final approach is based on data-driven emulators. Here the idea is to modify our ocean model according to available data in such a way as to best represent the effect of small-scale eddies in coarser-grid eddy-permitting models. We would do this by using data obtained from fine-grid simulations, as for the stochastic transport method. \\
+\linebreak
+The outcome of this project will be a significant improvement in understanding of the physical processes at work in the eddy backscatter mechanism that maintains the Gulf Stream, an important geophysical phenomenon which directly affects the climate of western Europe. Moreover, we shall propose and study several methods for implementing eddy parameterizations into ocean models, which would then allow the ocean models to efficiently exhibit the effects of ocean backscatter such that the models would then be applicable to climate studies. 
+
+\begin{thebibliography}{9}
+	\bibitem{i}  P. Berloff. Dynamically consistent Parameterization of Mesoscale Eddies. Part III: Deterministic Approach. \textit{Ocean Modelling}. 2018. \textbf{127}, 1-15.
+	\bibitem{ii} C. Cotter, D. Crisan, D. D. Holm, W. Pan, I. Shevchenko. Modelling uncertainty using circulation-preserving stochastic transport noise in a 2-layer quasi-geostrophic model. 2018. Available from arXiv:1802.05711v1 [physics.flu-dyn].
+	\bibitem{iii} I. Shevchenko, P. Berloff. Multi-Layer quasi-geostrophic ocean dynamics in Eddy-resolving regimes. \textit{Ocean Modelling}. 2015. \textbf{94}, 1–14.
+	\bibitem{iv} P. Sagaut. \textit{Large Eddy Simulation for Incompressible Flows}. Third Edition. Springer. 2006. 
+\end{thebibliography}
+
+\end{document}

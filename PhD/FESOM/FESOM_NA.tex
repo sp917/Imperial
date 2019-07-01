@@ -1,0 +1,433 @@
+\documentclass[10pt]{article}
+
+\input{../Preamble}
+
+\begin{document}
+\title{FESOM2.0: North Atlantic box configuration}
+\date{}
+\maketitle
+
+\section{The Model}
+
+	\subsection{Derivation of model (Danilov et al 2016)}
+In what follows bold font will be used to indicate two-dimensional vectors; ordinary font may be used for vectors of three dimensions, or scalars.\\
+A fluid is moving inside a domain $\M$, divided into $N$ discrete and disjoint triangular prisms $V_{k}$, which have triangular faces oriented horizontally:
+\eqnn{
+	\M = \bigcup_{k=1}^{N} V_{k}
+} 
+Consider the fluid contained within one of these regions. The fluid obeys Newton's second law
+\algnn{
+	&\D{}{t} \int_{V_{k}} \rho(x,t) u(x,t) d^{3}x + \int_{\pr V_{k}} \rho(x,t)u(x,t)  u(x,t) \cdot n dS \\
+	&\qquad  = -\int_{V_{k}} \lrsq{\rho(x,t)g e_{3} + \rho f e_{3}\times u(x,t) }d^{3}x   - \int_{\pr V_{k}} p(x,t) n dS
+}
+	where $\rho$ is the fluid density, and $u = (\B{u},w)$ the three dimensional velocity. Now let us split the integral into its horizontal and vertical components, and denote with an over-bar the height-average of a quantity: $\bar{\cdot} = \frac{1}{h} \int_{z_{-}}^{z_{+}} \cdot$, where $z_{\pm}(\B{x})$ are the top and bottom heights of the prism. This results in the following:
+	\algn{
+	&\D{}{t} \int_{A} h \ol{\rho u} dS + \int_{\pr A} h \ol{\rho u  \B{u}}\cdot n dS + \int_{A} \lrsq{\lrb{\rho u w}_{+} - \lrb{\rho u w}_{+} } dS  \nonumber\\
+	& \qquad  = -\int_{A}h\ol{ \lrsq{\rho g e_{3} + \rho f e_{3}\times u} }dS - \int_{\pr A} h\ol{p} n dS - e_{3}\int_{A} \lrsq{p_{+} - p_{-} }dS \label{eq:momeq}
+}
+where $A_{\pm}$ are the end (triangular) faces of the prism. $A$ is the horizontal area of the triangles.  \\
+\linebreak
+We now make the Boussinesq and hydrostatic approximations (see for example, Vallis page 71):
+\algn{
+	\rho & = \rho_{0} + \rho'(\B{x},z,t), \quad \rho'\ll \rho_{0} \\ 
+	p & = p_{0}(z) + p'(\B{x},z,t)	\\
+	 \PD{p}{z} & = - \rho g \label{eq:hydrostatic}
+}
+where $p_{0}$ is defined such that $\PD{p_{0}}{z} = -\rho_{0}g$ and with boundary condition $p_{0}(0) = 0$. Then $p_{0}(z) = -g\rho_{0}z$. Now, we also use the boundary condition that the pressure at the ocean surface vanishes, so that $p(\B{x},\eta(\B{x},t), t) = 0$. From this we may deduce that:
+\eqlab{
+	p'(\B{x},z,t) = g\rho_{0}\eta(\B{x},t) + g\int_{z}^{\eta(\B{x},t)}\rho'(\B{x},z',t)dz' \approx   g\rho_{0}\eta(\B{x},t) + g\int_{z}^{0}\rho'(\B{x},z',t)dz'
+}{pressure}
+where $z = \eta(\B{x},t)$ is the equation for the sea surface. \\
+\linebreak
+Furthermore, \cref{eq:pressure} gives us that:
+\eqnn{
+	p_{+} - p_{-} = -\rho_{0}g(z_{+} - z_{-}) - g\int_{z_{-}}^{z_{+}}\rho' dz = -\int_{z_{-}}^{z^{+}} \rho g dz = -h\ol{\rho g}
+}
+Thus the term $p_{+} - p_{-}$ in \cref{eq:momeq} cancels with the term $h\ol{\rho g}$ and we are left with:
+	\algnn{
+	&\D{}{t} \int_{A} h \ol{ \B{u}} dS + \oint_{\pr A} h \ol{ \B{u}  \B{u}}\cdot \B{n} dl + \int_{A} \lrsq{ (\B{u} w)_{+} - (\B{u} w)_{-}}  dS  \\
+	& \qquad  = -\int_{A}h f e_{3}\times \ol{\B{u}} dS - \frac{1}{\rho_{0}}\oint_{\pr A} h\ol{p'} \B{n} dl 
+}
+where we replace $p$ with $p'$ since $\oint_{\pr A} p'(z) dl = 0$.
+Now, to obtain equation (6) from Danilov et al (2016) we follow the procedure of Ringler et al (2013), dividing by the area $|A|$ and taking the small-$A$ limit, which is:
+\algn{
+	&\PD{}{t}  \lrb{h \ol{ \B{u}}} + \nabla\cdot\lrb{ h \ol{ \B{u}  \B{u}}} +  \B{u}_{+}w_{+} - \B{u}_{-}w_{-}   = - h f e_{3}\times \ol{\B{u}}  - \frac{1}{\rho_{0}}h\ol{\nabla p'} \label{eq:infinitessimalmomeq}
+}
+
+Now let us consider the continuity equation. We follow a similar process as before, with conservation of mass giving:
+\eqnn{
+	\D{}{t} \int_{V_{k}} \rho d^{3}x + \int_{\pr V_{k}} \rho u\cdot n dS = 0
+}
+As before we split $V_{k}(t)$ into its vertical and horizontal components:
+\eqnn{
+	\D{}{t} \int_{A} h\ol{\rho} dS + \int_{\pr A} h \ol{ \rho \B{u}}\cdot n dS + \int_{A}\lrsq{\rho_{+}w_{+} - \rho_{-}w_{-}}dS = 0
+}
+We apply the Boussinesq approximation:
+\eqnn{
+	\D{}{t} \int_{A} h dS + \int_{\pr A} h \ol{ \B{u}}\cdot n dS + \int_{A}\lrsq{w_{+} - w_{-}}dS = 0
+}
+Then, taking the small-$A$ limit:
+\eqnn{
+	\nabla\cdot\lrb{h \ol{ \B{u}}} + \lrsq{w_{+} - w_{-}} = 0
+}
+where we use the face that $h$ is constant. \\
+\linebreak
+\iffalse
+Now if we take \cref{eq:infinitessimalmomeq} and ignore the averaging overbars, then we can combine it with the continuity equation to obtain:
+\eqnn{
+	\PD{\B{u}}{t}  + \B{u}\cdot\nabla\B{u} +  \Half\lrsq{(w \pr_{z}\B{u})_{+} + (w \pr_{z}\b{u})_{-}}   + f e_{3}\times \B{u}  +  \frac{1}{\rho_{0}}\nabla p = 0
+}
+Where we define $(\pr_{z}\B{u})_{\pm} : = \frac{2}{h}\lrsq{\B{u}_{\pm} - \B{u}}$.\\
+\linebreak
+\fi
+Now, in the preceding paragraphs we have assumed that the height of each layer remains fixed. However, the upper surface of the fluid does not remain fixed and we may write $h = h_{0} + \eta$. However, we assume that $\eta \ll  h_{0}$ such that in the top layer the horizontal momentum equation has the same form as elsewhere. The continuity equation, however, gives:
+\eqnn{
+	\PD{h_{k}}{t} + \nabla\cdot\lrb{h_{k}\ol{\B{u}}_{k}} + w_{+}^{k} - w_{-}^{k} = 0
+}
+Summing over layers then gives:
+\eqnn{
+	\PD{\eta}{t} + \nabla\cdot\sum_{k}\lrb{h_{k}\ol{\B{u}}_{k}} = 0
+}
+\subsection{Equations of motion}
+Now, in the equations of motion we ignore the vertical averaging within cells, making the approximation that each quantity is constant within the cell on which it is defined. To summarize then, the equations of motion we are solving are the following:
+\eqsyslab{
+	&\PD{}{t}\lrb{h\B{u}}  + \nabla\cdot(h\B{u}\B{u}) +  \B{u}_{+}w_{+} - \B{u}_{-}w_{-}   + fh e_{3}\times \B{u}  +  \frac{1}{\rho_{0}}h\nabla p = D_{U} + (\nu_{v}\pr_{z}\B{u})_{+} - (\nu_{v}\pr_{z}\B{u})_{-}  \label{eq:momentum}\\
+	&\nabla\cdot\lrb{h  \B{u}} + \lrsq{w_{+} - w_{-}} = 0 \label{eq:continuity}\\
+	&\PD{\eta}{t} + \nabla\cdot\sum_{k}\lrb{h_{k}\B{u}_{k}} = 0 \label{eq:ssh}\\
+	& p'(\B{x},z,t) =   g\rho_{0}\eta(\B{x},t) + g\int_{z}^{0}\rho'(\B{x},z',t)dz' \label{eq:pressureeq}\\
+	&\rho' = \rho'(p',T) \label{eq:eos}\\
+	&\pr_{t}(h T) + \nabla\cdot(h\B{u}T) + w_{+}T_{+} - w_{-}T_{-} = \nabla\cdot\lrb{hK\nabla T} \label{eq:tracer}\\
+}{eqsofmotion}
+where $D_{U}$ contains the horizontal viscosity terms and $\nu_{v}$ is the vertical viscosity coefficient. \cref{eq:eos} is given by a linear equation of state $\rho = \rho_{0}(1 - \al(T-T_{0}))$ (See Danilov, Juricke et al 2019). The Coriolis parameter $f = 2\Omega\sin(y)$, with $\Omega =2\pi/(3600\times 24)$ the rotation rate of the earth.
+\subsection{Temporal Discretisation}
+For the temporal discretisation, we re-write \cref{eq:momentum} in the following form, denoting $\B{U} : = h\B{u}$:
+
+\eqnn{
+	\pr_{t}\B{U} = R_{U} - gh\nabla \eta +  (\nu_{v}\pr_{z}\B{u})_{+} - (\nu_{v}\pr_{z}\B{u})_{-}
+}
+where:
+\eqnn{
+	R_{U} = -  \nabla\cdot(\B{U}\B{u}) - \lrb{\B{u}_{+}w_{+} - \B{u}_{-}w_{-} } -  f e_{3}\times \B{U} - \nabla p_{h} / \rho_{0} + D_{U} = R_{U}^{*} - \nabla p_{h}/\rho_{0}
+}
+and $p_{h} : = g\int_{z}^{0} \rho' dz' $. \\
+\linebreak
+We then step forward in time as follows:
+\eqlab{
+	\B{U}^{n+1} - \B{U}^{n} = \Delta t \lrb{R_{U}^{n+1/2} + \lrsq{\nu_{v}\pr_{z}\B{u}^{n+1}}^{+}_{-} - gh\nabla\lrb{\theta\eta^{n+1} + (1-\theta)\eta^{n}}}
+}{timestep}
+where $\theta$ is an implicitness parameter and $\lrb{R_{U}^{*}}^{n+1/2}$ is calculated according to an Adams-Bashforth method:
+\eqnn{
+	\lrb{R_{U}^{*}}^{n+1/2} : = \frac{3}{2}\lrb{R_{U}^{*}}^{n} - \frac{1}{2}\lrb{R_{U}^{*}}^{n-1/2}
+}
+However, we split \cref{eq:timestep} into two steps: a predictor and corrector step. Set $\Delta \B{U} : = \B{U}^{*} - \B{U}^{n}$, then we use as the predictor step:
+\eqnn{
+	\Delta \B{U} -  \frac{1}{h}\lrsq{\nu_{v}\pr_{z}\Delta\B{U}}^{+}_{-}= \Delta \tl{\B{U}}  + \frac{1}{h}\lrsq{\nu_{v}\pr_{z}\B{U}^{n}}^{+}_{-}
+}
+where $\Delta\tl{\B{U}} : = \Delta t\lrb{R_{U}^{n+1/2} - gh\nabla\eta^{n}}$. \\
+\linebreak
+Now let us define $\bar{\B{U}}: = \sum_{k}\B{U}$ and similarly for other quantities. Then, if we assume that $\pr_{z}\B{U} = 0$ at the top and bottom of the ocean (this is given by the free-slip boundary condition), we may deduce from \cref{eq:timestep}:
+\eqnn{
+	\bar{\B{U}}^{n+1} - \bar{\B{U}}^{n} = \ol{\Delta\B{U}} - g\Delta t \theta (H + \eta^{n+1/2})\nabla\lrb{\eta^{n+1} - \eta^{n}}
+}
+where $H = \sum_{k} h_{k}$. We can also discretise the $\eta$ equation as:
+\eqnn{
+	\eta^{n+1} - \eta^{n} = - \Delta t \nabla\cdot \lrb{\al \bar{\B{U}}^{n+1} + (1-\al)\bar{\B{U}}^{n}}
+}
+where $\al$ is another implicitness parameter. We can then combine these two equations to get:
+\eqnn{
+	\eta^{n+1} - \eta^{n} -g\Delta t^{2}\theta\al\nabla\cdot\lrb{(H + \eta^{n+1/2})\nabla(\eta^{n+1} - \eta^{n})} = -\Delta t\nabla\cdot \lrb{\bar{\B{U}}^{n} + \al\ol{\Delta\B{U}}}
+}
+The corrector step may then proceed as:
+\eqnn{
+	\B{U}^{n+1} - \B{U}^{n} = \Delta\B{U} - g\Delta t h\theta\nabla(\eta^{n+1} - \eta^{n})
+}
+Note that the equation for $\eta$ may be alternatively discretised as:
+\eqnn{
+	\eta^{n+1/2} - \eta^{n-1/2} = -\Delta t \nabla\cdot \bar{\B{U}}^{n}
+}
+And then we may set:
+\eqnn{
+	\eta^{n} = \al\eta^{n+1/2} + (1-\al)\eta^{n-1/2}
+}
+To summarize, the time-stepping process is as follows:
+\begin{itemize}
+	\item $ \eta^{n} = \al\eta^{n+1/2} + (1-\al)\eta^{n-1/2}$
+	\item
+$
+	\Delta \B{U} -  \frac{1}{h}\lrsq{\nu_{v}\pr_{z}\Delta\B{U}}^{+}_{-}= \Delta \tl{\B{U}}  + \frac{1}{h}\lrsq{\nu_{v}\pr_{z}\B{U}^{n}}^{+}_{-}
+$
+\item 
+$
+	\eta^{n+1} - \eta^{n} -g\Delta t^{2}\theta\al\nabla\cdot\lrb{(H + \eta^{n+1/2})\nabla(\eta^{n+1} - \eta^{n})} = -\Delta t\nabla\cdot \lrb{\bar{\B{U}}^{n} + \al\ol{\Delta\B{U}}}
+$
+\item
+$
+	\B{U}^{n+1} - \B{U}^{n} = \Delta\B{U} - g\Delta t h\theta\nabla(\eta^{n+1} - \eta^{n})
+$
+\item
+$
+	w_{+}^{n+1} - w_{-}^{n+1} = -\nabla\cdot\B{U}^{n+1}
+$
+\item 
+$
+	\eta^{n+3/2} - \eta^{n+1/2} = -\Delta t \nabla\cdot \bar{\B{U}}^{n+1}
+$
+\item Advect tracers.
+\item Calculate $p'$, $\rho'$ from diagnostic equations.
+\end{itemize}
+
+\subsection{Spatial Discretisation}
+We here explain how to discretise the terms with spatial derivatives in \cref{eq:eqsofmotion}. Concretely, we have:
+\eqnn{
+	A_{v}\lrb{\nabla\cdot(\B{U}\B{u})}_{v} : = \sum_{e(v)}\sum_{c(e)} \B{U}_{c}\cdot \B{n}_{ec} d_{ec} \B{U}_{c}/h
+}
+Then to get the value of the quantity on a cell centre, we simply take the average over the vertices connected to that cell:
+\eqnn{
+	\lrb{\nabla\cdot(\B{U}\B{u})}_{c} = \frac{1}{3}\sum_{v(c)} \lrb{\nabla\cdot(\B{U}\B{u})}_{v}
+}
+To calculate $\nabla p$:
+\eqnn{
+	A_{c}(\nabla p)_{c} = \sum_{e(c)}l_{e}\B{n}_{e} \sum_{v(e)}p_{v}/2
+}	
+ Viscosity terms are calculated as:
+ \eqnn{
+ 	A_{c}D_{U} = \Half \sum_{e(c)} \lrb{\nu_{n(e)} + \nu_{c}}\lrb{\B{U}_{n(e)} - \B{U}_{c}}l_{e}/\abs{\B{r}_{c n(e)}} 
+ }
+where $n(e)$ denotes the cell that shares edge $e$ with cell $c$, $l_{e}$ is the length of edge $e$ and $\B{r}_{c n(e)}$ is the vector connecting the centroids of cells $c$ and $n(e)$. The viscosities $\nu_{c}$ are modified Leith viscosities calculated as:
+\eqnn{
+	\nu_{c} =0.2 \min\lrc{\text{A\_hor}\lrb{\tfrac{A_{c}}{\text{scale\_area}}} + A_{c}^{3/2}\sqrt{\text{Div\_c}\abs{\nabla (e_{3}\cdot \curl \B{U})}^{2} + \text{Leith\_c}\abs{\nabla\Div\B{U}}^{2}}, A_{c}/\Delta t}
+}
+
+\section{Model Set-up}
+
+\subsection{Domain}
+
+We use a grid from $0^\circ$ to $40^\circ$ in the zonal direction, and from $30^\circ$ to $60^\circ$ in the meridional direction. We use a grid with default node spacing of $1/4^{\circ}$ in both directions. The nodes are  connected to partition the domain into triangular cells. We remove nodes that are connected to only one triangle, as these produce numerical errors..\\
+\linebreak
+In the vertical direction there are 23 layers, with depths (in metres) of 0, 10, 22, 35, 49, 63, 79, 100, 150, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 1600.\\
+\linebreak
+We take a timestep of $\Delta t = \frac{\text{day}}{96}$. 
+
+\subsection{Boundary Conditions}
+
+Currently the only option for boundary conditions is free-slip. This is imposed through the use of 'ghost cells' at boundaries, as which we impose a velocity $\B{u}_{n} = \B{u}_{c} - 2(\B{u}_{c}\cdot\B{n}_{nc})\B{n}_{nc}$ for a ghost cell $n$ adjacent to a boundary cell $c$, with $\B{n}_{nc}$ the normal to the boundary. \\
+\linebreak
+Then on the boundary we have velocity $\B{u}_{b} = \frac{\B{u}_{c} + \B{u}_{n}}{2} = \B{u}_{c} - (\B{u}_{c}\cdot \B{n}_{nc})\B{n}_{nc}$, which satisfies the no-through-flow condition $\B{u}_{b}\cdot \B{n}_{nc} = 0$.\\
+\linebreak
+This implementation of ghost cells is, however, insufficient for imposing the free-slip condition. (see Danilov et al 2017, p772).
+
+\subsection{Initial Conditions}
+
+The model is spun up from a state of rest. 
+
+There is an initial temperature profile given by:
+
+\eqnn{
+	T(z) = 22 + 19\tanh\lrb{\frac{z}{300}} + \frac{z}{2500}
+}
+
+[This is specified in \texttt{oce\_ice\_init\_state.F90} in the subroutine \texttt{initial\_state\_channel\_test}.]\\
+\linebreak
+
+\subsection{Model Parameters}
+
+
+
+\begin{table}[H]
+	\centering
+		\begin{tabular}{|c|c|c|c|}
+			\hline
+				    Parameter	 	& 		Value	&  Interpretation	& Units\\
+			\hline
+				    		C\_{d}	 &			0.001			     & 		\text{Bottom drag coefficient}		&	\text{none}	\\
+				    		 A\_{vert}	 &			$10^{-4}$				& 		\text{Vertical viscosity}	 & $m^{2}s^{-1}$	\\
+				      	A\_{hor}	 &				2000			& 			\text{Background horizontal viscosity}							&		 $m^{2}s^{-1}$				\\
+				      	A\_{hor\_{max}} 	&		8000			& 			\text{Maximum viscosity}		&  $m^{2}s^{-1}$\\
+				      	Div\_{c} 	&		5					&			\text{Modified Leith viscosity	}		&	 \text{none}\\
+				      	Leith\_{c}		&		0.5				&			\text{Strength of Leith viscosity} 	&	 \text{none} \\
+				      	scale\_area	&		$5.8\times 10^{9}$ &		\text{Reference area for viscosities}  &  $m^{2}$\\
+				      	\iffalse
+				      	Ricr*	&		0.3				&			\text{critical bulk Richardson number} 	&	 \text{none}\\ 
+				      	concv*	&		1.6				&			\text{constant for pure convection}		&  \\
+				      	\fi
+				      	K\_{ver}		& 		$10^{-5}$			& 			\text{Vertical Tracer diffusion}	&	\\
+				      	K\_{hor}		& 		150				&			\text{Horizontal Tracer diffusion}	& \\
+				      	$\rho_{0}$    &		1025				&			\text{Background water density}  	& $kg m^{-3}$ \\
+				      	$x_{min}$	    &		0					&			\text{Longitude of western boundary} & ${}^{\circ}$ \\
+				      	$x_{max}$	    &		40					&			\text{Longitude of eastern boundary} & ${}^{\circ}$ \\
+				      	$y_{min}$	    &		30					&			\text{Latitude of southern boundary} & ${}^{\circ}$ \\
+				      	$y_{max}$	    &		60					&			\text{Longitude of Northern boundary} & ${}^{\circ}$ \\
+				      	$\Delta x$					&		1/4, 1/8				&			\text{Horizontal distance between adjacent nodes} & ${}^{\circ}$ \\
+				      	$\Delta y$					&		1/4, 1/8				&			\text{Vertical distance between adjacent nodes} & ${}^{\circ}$ \\
+				      	$\Delta t$ 				&		1/96, 1/192	&		\text{Time-step} 	&	days \\
+              \hline
+		\end{tabular}
+		\caption{Model Parameters\\
+		\iffalse
+		 *Used only in 'KPP' mixing scheme
+		 \fi
+		 }
+\end{table}
+
+
+\subsection{Forcings}
+
+We use the following wind forcing:
+
+\eqnn{
+	\tau_{x} = -0.2\cos\lrb{\frac{\pi}{15} y}
+}
+where $y$ is the latitude, measured in degrees.
+
+\begin{figure}[H]
+ \includegraphics[width=0.5\linewidth]{./MESHES/simple_box/results_std/plots/tx_sur__1_1948.png}
+\centering
+\end{figure}
+
+There is also a bottom drag given by:
+\eqnn{
+	\left. \nu_{v}\pr_{z}\B{u} \right|_{bottom} = C_{d}\B{u}\abs{\B{u}}
+}
+
+\section{Some Results}
+
+\subsection{Standard Square Grid}
+
+We use a grid from $0^\circ$ to $40^\circ$ in the zonal direction, and from $30^\circ$ to $60^\circ$ in the meridional direction. We use a grid with default node spacing of $1/4^{\circ}$ in both directions. The nodes at the extreme South-West and North-East are removed since they are only connected to one triangle and this produces numerical errors.
+
+\IfFileExists{./MESHES/simple_box/results_std/plots/mesh.jpg}{
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.45\textwidth}
+  			\centering
+ 			 \includegraphics[width=0.9\linewidth]{./MESHES/simple_box/results_std/plots/mesh.jpg}
+		\end{subfigure}%
+		\begin{subfigure}{0.45\textwidth}
+ 			 \centering
+ 			 \includegraphics[width=0.9\linewidth]{./MESHES/simple_box/results_std/plots/mesh_vert.jpg}
+		\end{subfigure}
+	\end{figure}
+}
+\iffalse
+\allplot{simple}{box}{1}{1948}{12}{1956}{0}{10}{22}
+\fi
+
+\subsection{Modified Coastline}
+
+It is possible to modify the coastal boundary. For example, we may consider the following mesh:
+
+
+\begin{figure}[H]
+\centering
+  \includegraphics[width=0.45\linewidth]{./MESHES/coastal_slope/results_std/plots/mesh.jpg}
+  \caption{\footnotesize Grid with modified coastline}
+  \label{fig:mesh_coastal_slope}
+\end{figure}
+
+\subsubsection{Results}
+
+A selection of results from this grid is given below:
+\iffalse
+\allplot{coastal}{slope}{1}{1948}{12}{1956}{0}{10}{22}
+\fi
+\subsection{High-Resolution Square Grid}
+Here we double the resolution in each direction, using a grid spacing of $1/8^\circ$. In order to ensure stability according to the CFL criterion, we therefore half the timestep and use $day/192$. 
+
+\IfFileExists{./MESHES/high_res/results_std/plots/mesh.jpg}{
+	\begin{figure}[H]
+		\centering
+		\begin{subfigure}{0.45\textwidth}
+  			\centering
+ 			   \includegraphics[width=0.9\linewidth]{./MESHES/high_res/results_std/plots/mesh.jpg}
+ 				 \caption{\footnotesize A section of the high resolution box grid}
+ 				 \label{fig:mesh_high_res}
+		\end{subfigure}%
+		\begin{subfigure}{0.45\textwidth}
+ 			 \centering
+ 			 \includegraphics[width=0.9\linewidth]{./MESHES/high_res/results_std/plots/mesh_vertical.jpg}
+		\end{subfigure}
+	\end{figure}
+}
+
+\iffalse
+\allplot{high}{res}{1}{1948}{12}{1956}{0}{10}{22}
+\fi
+\subsection{Grid with bottom topography}
+
+Now we return to the $(1/4)^\circ$ resolution grid, but modify the bottom topography according to:
+\eqnn{
+Z(x,y) = -1500 + 100\sin\lrb{\tfrac{\pi}{15}y}
+}
+where $y$ is the latitude, measured in degrees. 
+
+\iffalse
+\allplot{bottom}{topog}{1}{1948}{12}{1956}{0}{10}{22}
+\fi
+
+\subsection{Stronger Wind Forcing}
+
+We double the coefficient of wind forcing to 0.4.
+
+\subsection{Weaker Viscosity}
+
+We reduce the viscosity coefficient $A_{hor}$ to 200.
+
+\subsection{Temperature Relaxation}
+
+We add a temperature forcing at the north and south boundaries:
+
+\eq{
+	F_{T} = C_{relax}\lrsq{ 1_{y>58.5^{\circ}}\lrb{1 - (60^{\circ} - y)/1.5^{\circ}} +  1_{y<31.5^{\circ}}\lrb{1 + (30^{\circ} - y)/1.5^{\circ}}}(T_{clim} - T) 
+}
+
+where $C_{relax}$ is the inverse relaxation time-scale; we choose the relaxation time to be approximately 10 days, thus $C_{relax} = 1.1574\times 10^{-6} \approx 1/(10\times 3600\times 24)$.  
+
+\subsection{Changing initial Temperature profile}
+
+The original profile is given by:
+
+\eqnn{
+	T(z; T_{0}, \al, L,h) = T_{0} + \al \tanh(z/L) + z/h
+}
+for $T_{0} = 22$, $\al = 19$, $L = 300$, $h = 2500$. We modify this by choosing a new $L' = 100$ and $h' = 400$ and $T_{0}',\al'$ such that $T(-1600; T_{0}',\al',L',h') = T(-1600; T_{0},\al,L,h)$ and $\int_{-1600}^{0}T(z;T_{0}',\al',L',h')dz = \int_{-1600}^{0}T(z;T_{0},\al,L,h)dz$. Specifically $T_{0} = 24.5589$ and $\al = 18.1980$. This gives a more clearly defined thermocline. 
+
+\section{Rossby Deformation Radii}
+
+(cf lecture notes from GFD)
+
+The Rossby deformation radii are defined to be the eigenvalues given by the following eigenvalue problem:
+\algnn{
+	\L\Phi &= \lambda \Phi \\
+	\PD{\Phi}{z} &= 0 \qquad \text{at} \quad z = 0 \quad \text{and} \quad z=-H \\
+	\L &:= \frac{f_{0}^{2}}{\rho} \PD{}{z}\lrb{\frac{\rho}{N^{2}}\PD{}{z}} 
+}
+where $N^{2}$ is the Brunt-V\"{a}is\"{a}il\"{a} frequency. In order to solve the eigenvalue problem for this operator we discretise as follows:
+\algnn{
+	(\L\Phi)_{k} & = \frac{f_{0}^{2}}{\rho_{k} \Delta_{k-1/2}}\lrsq{\frac{\rho_{k-1/2}}{N^{2}_{k-1/2}\Delta_{k-1}}\Phi_{k-1} - \lrb{\frac{\rho_{k-1/2}}{N^{2}_{k-1/2}\Delta_{k-1}} + \frac{\rho_{k+1/2}}{N^{2}_{k+1/2}\Delta_{k}}}\Phi_{k}  + \frac{\rho_{k+1/2}}{N^{2}_{k+1/2}\Delta_{k}}\Phi_{k+1}}  \\
+					& = \sum_{j=0}^{n_{l}-1} \frac{f_{0}^{2}}{\rho_{k} \Delta_{k-1/2}}\lrsq{\frac{\rho_{k-1/2}}{N^{2}_{k-1/2}\Delta_{k-1}}\delta_{(k-1)j} - \lrb{\frac{\rho_{k-1/2}}{N^{2}_{k-1/2}\Delta_{k-1}} + \frac{\rho_{k+1/2}}{N^{2}_{k+1/2}\Delta_{k}}}\delta_{kj}  + \frac{\rho_{k+1/2}}{N^{2}_{k+1/2}\Delta_{k}}\delta_{(k+1)j}}\Phi_{j}
+}
+
+where $k$ denotes the layer and $k\pm1/2$ denote the bottom and top of layer $k$. $\Delta_{k}$ is therefore the distance between the midpoint of layer $k$ and the midpoint of layer $k+1$. $\Delta_{k-1/2}$ is the thickness of layer $k$. $n_{l}$ is the total number of layers. Note that the above expression is only valid when $k\neq 0, n_{l}-1$ and we must make a slightly different definition in these cases, according to the boundary conditions.  \\
+\linebreak
+Thus we have our discretised operator:
+\algnn{
+	\L_{kj} &=  \frac{f_{0}^{2}}{\rho_{k} \Delta_{k-1/2}}\lrsq{\frac{\rho_{k-1/2}}{N^{2}_{k-1/2}\Delta_{k-1}}\delta_{(k-1)j} - \lrb{\frac{\rho_{k-1/2}}{N^{2}_{k-1/2}\Delta_{k-1}} + \frac{\rho_{k+1/2}}{N^{2}_{k+1/2}\Delta_{k}}}\delta_{kj}  + \frac{\rho_{k+1/2}}{N^{2}_{k+1/2}\Delta_{k}}\delta_{(k+1)j}} \qquad k\neq 0, n_{l}-1 \\
+	\L_{0j} &=  \frac{f_{0}^{2}}{\rho_{0} \Delta_{-1/2}} \frac{\rho_{1/2}}{N^{2}_{1/2}\Delta_{0}}\lrsq{\delta_{1j} - \delta_{0j}} \\
+	\L_{(n_{l}-1)j} & = \frac{f_{0}^{2}}{\rho_{n_{l}-1} \Delta_{n_{l}-3/2}}\frac{\rho_{n_{l}-3/2}}{N^{2}_{n_{l}-3/2}\Delta_{n_{l}-2}}\lrsq{\delta_{(n_{l}-2)j} - \delta_{(nl-1)j}} 
+}
+
+\subsection{Alternative Formulation}
+
+Here we discretise without using mid-layer densities. Then, denoting the number of layers by $n_{l}$, so that there are $n_{l}+1$ levels, we discretise the operator using a central difference approximation for levels $1,...,n_{l}-1$ and boundary condition $\PD{\Phi}{z} = 0$ at the top and bottom:
+\algnn{
+	\L_{kj} & = \frac{f_{0}^{2}\ol{\rho}}{g} \frac{1}{\rho_{k}(\Delta_{k-1} + \Delta_{k})}\lrsq{\frac{\rho_{k-1}}{\rho_{k-2} - \rho_{k}}\lrb{\delta_{j(k-2)} - \delta_{jk}} + \frac{\rho_{k+1}}{\rho_{k} - \rho_{k+2}}\lrb{\delta_{j(k+2)} - \delta_{jk}} } \qquad \text{for} \quad k=2,...,n_{l}-2 \\
+	\L_{1j} & = \frac{f_{0}^{2}\ol{\rho}}{g} \frac{1}{\rho_{1}(\Delta_{0} + \Delta_{1})}\frac{\rho_{2}}{\rho_{1} - \rho_{3}}\lrb{\delta_{j 3} - \delta_{j1}} \\
+	\L_{(n_{l}-1)j} & = \frac{f_{0}^{2}\ol{\rho}}{g} \frac{1}{\rho_{n_{l}-1}(\Delta_{n_{l}-2} + \Delta_{n_{l}-1})}\frac{\rho_{n_{l}-2}}{\rho_{n_{l}-3} - \rho_{n_{l}-1}}\lrb{\delta_{j(n_{l}-3)} - \delta_{j(n_{l}-1)}}
+}
+Here $\Delta_{k}$ is the thickness of layer $k$ and $\ol{\rho}$ is the background density, usually denoted $\rho_{0}$ but here the notation is changed to avoid confusion with the density at level $0$. For the top and bottom levels we use a forward and backward difference approximation respectively:
+\algnn{
+	\L_{0 j} & = \frac{f_{0}^{2}\ol{\rho}}{g} \frac{1}{\rho_{0}\Delta_{0}}\frac{\rho_{1}}{\rho_{0} - \rho_{1}}\lrb{\delta_{j 2} - \delta_{j0}}  \\
+	\L_{n_{l}j} & = \frac{f_{0}^{2}\ol{\rho}}{g} \frac{1}{\rho_{n_{l}}\Delta_{n_{l}-1} }\frac{\rho_{n_{l}-1}}{\rho_{n_{l}-2} - \rho_{n_{l}}}\lrb{\delta_{j(n_{l}-2)} - \delta_{jn_{l}}} 
+	}
+	
+\end{document}

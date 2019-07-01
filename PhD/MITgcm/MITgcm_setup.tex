@@ -1,0 +1,86 @@
+\documentclass[10pt]{article}
+
+\input{../Preamble}
+
+\begin{document}
+\title{MITgcm: Model Set-Up}
+\date{}
+\maketitle
+
+\section{Set-up}
+
+Baroclinic gyre as detailed at \url{http://mitgcm.org/sealion/online_documents/node101.html}. (However, we have changed the time and spatial step size)\\
+\linebreak
+The model solves the hydrostatic primitive equations on a $60^{\circ}\times 60^{\circ}$ domain. \\
+\linebreak
+There are four vertical levels, each of height $500m$, and the horizontal grid has a spacing of $\Delta x = \Delta y = (1/4)^{\circ}$. \\
+\linebreak
+The flow is forced in the upper layer by a wind profile given by:
+\eqnn{
+	\tau_{x}  = \tau_{0} \sin \lrb{\pi y / 60}
+}
+The Coriolis parameter varies according to:
+\eqnn{
+	f = 2\Omega \sin(y)
+}
+And the equation of state is linear:
+\eqnn{
+	\rho = \rho_{0}\lrb{1- \al \theta}
+}
+There is a Laplacian viscosity $A_{h}\nabla^{2} + A_{v}\PD{^{2}}{z^{2}}$.
+
+\section{Initial Conditions}
+
+Velocity fields $u,v,w$ are initially at rest. \\
+\linebreak
+Temperature profile is set to $20^\circ$ everywhere except the northern and eastern boundaries, where it is zero.
+
+\section{Boundary Conditions}
+
+There is no temperature flux through boundaries, $\nabla \theta = 0$ and $\PD{\theta}{z} = 0$ on boundaries. \\
+\linebreak
+No-slip condition imposed at bottom boundary; free slip on lateral boundaries. 
+
+
+\section{Some Results}
+
+We run the model for $10 \times 365$ days with a time-step $\Delta t = 1/96$ days.
+
+\mitgcmplot{U}{50}{1}
+\mitgcmplot{U}{50}{2}
+\mitgcmplot{U}{50}{3}
+\mitgcmplot{U}{50}{4}
+\mitgcmplot{U}{100}{1}
+\mitgcmplot{U}{100}{2}
+\mitgcmplot{U}{100}{3}
+\mitgcmplot{U}{100}{4}
+
+\mitgcmplot{V}{50}{1}
+\mitgcmplot{V}{50}{2}
+\mitgcmplot{V}{50}{3}
+\mitgcmplot{V}{50}{4}
+\mitgcmplot{V}{100}{1}
+\mitgcmplot{V}{100}{2}
+\mitgcmplot{V}{100}{3}
+\mitgcmplot{V}{100}{4}
+
+\mitgcmplot{W}{50}{1}
+\mitgcmplot{W}{50}{2}
+\mitgcmplot{W}{50}{3}
+\mitgcmplot{W}{50}{4}
+\mitgcmplot{W}{100}{1}
+\mitgcmplot{W}{100}{2}
+\mitgcmplot{W}{100}{3}
+\mitgcmplot{W}{100}{4}
+
+\mitgcmplot{T}{50}{1}
+\mitgcmplot{T}{50}{2}
+\mitgcmplot{T}{50}{3}
+\mitgcmplot{T}{50}{4}
+\mitgcmplot{T}{100}{1}
+\mitgcmplot{T}{100}{2}
+\mitgcmplot{T}{100}{3}
+\mitgcmplot{T}{100}{4}
+
+
+\end{document}
